@@ -73,8 +73,12 @@ existing targets stay in force and the keeper logs a skip.
 - No third-party audit yet. This document plus `forge test` (63 tests: 56 unit/fuzz plus 7 invariants) is the
   starting package, not a substitute.
 - No formal verification of the fee/high-water-mark math.
-- The keeper is a single hot key with no redundancy; a stalled keeper degrades yield (idle capital,
-  drifting weights) but cannot lose funds. Withdrawals never depend on it.
+- The keeper is still a single hot key. It now survives an RPC failing over, bounds every tick in
+  time, pages on repeated failures, on a balance too low to pay gas and on the vault being paused,
+  and exposes a health endpoint a supervisor can watch. Multiple instances are safe to run because
+  every call is simulated first. What none of that changes: the key itself is hot, and a stalled
+  keeper still degrades yield (idle capital, drifting weights) — it simply no longer does so
+  quietly. It cannot lose funds, and withdrawals never depend on it.
 - `previewRebalance()` is a view, so it plans on the stored rate EMA, while `rebalance()` samples
   fresh rates first. Near the threshold the two can disagree; the keeper simulates every call
   before sending, so it never spends gas on the difference, but the UI number can be marginally

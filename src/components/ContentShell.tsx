@@ -42,7 +42,7 @@ export function ContentHeader({ active }: { active?: string }) {
             key={n.href}
             href={n.href}
             aria-current={active === n.href ? "page" : undefined}
-            className={`shrink-0 ${active === n.href ? "text-zinc-900" : "hover:text-zinc-900"}`}
+            className={`-my-1.5 shrink-0 py-1.5 ${active === n.href ? "text-zinc-900" : "hover:text-zinc-900"}`}
           >
             {n.label}
           </Link>

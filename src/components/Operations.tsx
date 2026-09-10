@@ -102,7 +102,7 @@ export function ActivityFeed() {
     <section id="activity" className="border-t hairline">
       <div className="px-6 sm:px-10 pt-12 pb-8 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="tag mb-4">[06] History</p>
+          <p className="tag mb-4">[07] History</p>
           <h2 className="text-[28px] sm:text-[36px] leading-[1] tracking-[-0.03em] font-medium">
             Every move the vault made.
           </h2>

@@ -63,6 +63,7 @@ contract Deploy is Script {
         poolsJson = string.concat(poolsJson, "]");
         string memory json = string.concat(
             '{"chainId":', vm.toString(block.chainid),
+                ',"block":', vm.toString(block.number),
             ',"deployer":"', vm.toString(deployer),
             '","usdg":"', vm.toString(address(usdg)),
             '","vault":"', vm.toString(address(vault)),

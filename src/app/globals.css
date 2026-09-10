@@ -11,6 +11,16 @@
   --line-strong: #0000002e;
   --accent: #2563eb;
   --notice: #f4f4f5;
+
+  /* Material layer. Depth is an affordance here, not decoration: a control that can be
+     pressed looks pressable and actually moves, a field that receives input is recessed,
+     and a card that can be opened lifts by a hair. Shadows are near-black at very low
+     alpha rather than grey glows, and corners stay sharp — the soft blob look would read
+     as generic and would fight the precision the numbers on this site are meant to carry. */
+  --lift-1: 0 1px 1px rgb(9 9 11 / 0.03), 0 2px 6px rgb(9 9 11 / 0.04);
+  --lift-2: 0 1px 1px rgb(9 9 11 / 0.04), 0 8px 20px rgb(9 9 11 / 0.07);
+  --well: inset 0 1px 2px rgb(9 9 11 / 0.09), inset 0 0 0 1px rgb(9 9 11 / 0.04);
+  --press: inset 0 2px 3px rgb(9 9 11 / 0.22);
 }
 
 @theme inline {
@@ -74,9 +84,28 @@ body {
   white-space: nowrap;
 }
 .btn:hover { background: var(--ink); color: #fff; }
-.btn-fill { background: var(--ink); color: #fff; }
-.btn-fill:hover { background: #2a2a2e; }
+.btn-fill { background: var(--ink); color: #fff; box-shadow: var(--lift-1); }
+.btn-fill:hover { background: #2a2a2e; box-shadow: var(--lift-2); }
 .btn-sm { height: 32px; padding: 0 0.9rem; font-size: 10px; }
+/* A control that does something should feel like it took the press. */
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--press);
+}
+/* A dimmed black slab reads as broken. A disabled control should recede, not loom. */
+.btn:disabled,
+.btn-fill:disabled {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--faint);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* chips */
 .chip {
@@ -91,6 +120,7 @@ body {
   transition: all 120ms ease;
 }
 .chip:hover { border-color: var(--ink); }
+.chip:active { transform: translateY(1px); box-shadow: var(--press); }
 .chip[data-active="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 
 /* slider */
@@ -353,3 +383,57 @@ input[type="range"].slider::-moz-range-thumb {
 }
 .prose-mosaic td code { white-space: nowrap; }
 .prose-mosaic input[type="checkbox"] { margin-right: 0.5rem; accent-color: var(--accent); }
+
+
+/* =====================================================================
+   Surfaces. Three states only: flat (default), raised (interactive card),
+   recessed (accepts input). Anything that needs a fourth is over-designed.
+   ===================================================================== */
+.surface {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  transition: box-shadow 160ms ease, transform 160ms ease, border-color 160ms ease;
+}
+/* Lifts on hover so a card that opens something reads as pickable-up. */
+/* Usable without .surface, for rows that already sit in a ruled list. */
+.surface-raise { transition: box-shadow 160ms ease, transform 160ms ease, border-color 160ms ease; }
+.surface-raise:hover {
+  box-shadow: var(--lift-2);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+.surface-raise:active { transform: translateY(0); box-shadow: var(--lift-1); }
+
+/* A field should look like it receives. The recess does the work that a placeholder
+   and a border alone cannot: it says "put something here" before you read anything. */
+.field {
+  background: var(--bg-alt);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--well);
+  transition: box-shadow 140ms ease, border-color 140ms ease;
+}
+.field:focus-within {
+  border-color: var(--ink);
+  box-shadow: var(--well), 0 0 0 3px rgb(37 99 235 / 0.12);
+}
+.field input { background: transparent; }
+
+/* The idle-buffer / allocation bar, read as a physical tape rather than a chart. */
+.tape {
+  box-shadow: var(--well);
+  background: var(--bg-alt);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface,
+  .surface-raise,
+  .btn,
+  .chip {
+    transition: none;
+  }
+  /* Usable without .surface, for rows that already sit in a ruled list. */
+.surface-raise { transition: box-shadow 160ms ease, transform 160ms ease, border-color 160ms ease; }
+.surface-raise:hover { transform: none; }
+  .btn:active:not(:disabled),
+  .chip:active { transform: none; }
+}

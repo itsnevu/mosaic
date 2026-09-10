@@ -5,8 +5,32 @@ import { useChainId, usePublicClient } from "wagmi";
 import type { Address, Log } from "viem";
 import { getDeployment, mosaicVaultAbi } from "./contracts";
 
-/** How far back to scan for vault activity. Whole history on a fresh chain, a window on a busy one. */
-const LOOKBACK_BLOCKS = BigInt(process.env.NEXT_PUBLIC_LOG_LOOKBACK ?? 100_000);
+/**
+ * Log scanning, sized for real providers rather than for a local chain.
+ *
+ * Most hosted RPCs cap `eth_getLogs` at a few thousand blocks, so a single call over a
+ * hundred-thousand-block window simply fails. History is therefore walked backwards from the
+ * head in chunks, stopping as soon as enough rows are in hand — on an active vault that is
+ * usually the first chunk — and bounded so a quiet vault cannot spin forever.
+ *
+ * This is not an indexer and does not pretend to be one. A busy chain with a long history
+ * still wants one; what this does is stay correct and cheap without it.
+ */
+const CHUNK_BLOCKS = BigInt(process.env.NEXT_PUBLIC_LOG_CHUNK ?? 10_000);
+const MAX_CHUNKS = Number(process.env.NEXT_PUBLIC_LOG_MAX_CHUNKS ?? 12);
+
+type Chunk = { from: bigint; to: bigint };
+
+/** Block ranges from the head backwards, floored at the deployment block when known. */
+function* chunksBackFrom(latest: bigint, floor: bigint): Generator<Chunk> {
+  let to = latest;
+  for (let i = 0; i < MAX_CHUNKS && to >= floor; i++) {
+    const from = to > floor + CHUNK_BLOCKS ? to - CHUNK_BLOCKS : floor;
+    yield { from, to };
+    if (from === floor) return;
+    to = from - 1n;
+  }
+}
 
 export type ActivityKind = "Deployed" | "Rebalanced" | "FeeAccrued" | "TargetWeightsSet" | "ScoredWeightsApplied";
 
@@ -54,7 +78,8 @@ function describe(kind: ActivityKind, args: Record<string, unknown>): { detail: 
 export function useVaultActivity(limit = 25) {
   const chainId = useChainId();
   const client = usePublicClient();
-  const vault = getDeployment(chainId)?.vault as Address | undefined;
+  const deployment = getDeployment(chainId);
+  const vault = deployment?.vault as Address | undefined;
 
   const q = useQuery({
     queryKey: ["vault-activity", chainId, vault, limit],
@@ -63,16 +88,25 @@ export function useVaultActivity(limit = 25) {
     queryFn: async (): Promise<ActivityRow[]> => {
       if (!client || !vault) return [];
       const latest = await client.getBlockNumber();
-      const fromBlock = latest > LOOKBACK_BLOCKS ? latest - LOOKBACK_BLOCKS : 0n;
+      const floor = BigInt(deployment?.block ?? 0);
 
-      const batches = await Promise.all(
-        KINDS.map((eventName) =>
-          client
-            .getContractEvents({ address: vault, abi: mosaicVaultAbi, eventName, fromBlock, toBlock: latest })
-            .then((logs) => logs.map((l) => ({ kind: eventName, log: l as Log & { args?: Record<string, unknown> } })))
-            .catch(() => []),
-        ),
-      );
+      const batches: { kind: ActivityKind; log: Log & { args?: Record<string, unknown> } }[][] = [];
+      let found = 0;
+      for (const { from, to } of chunksBackFrom(latest, floor)) {
+        const round = await Promise.all(
+          KINDS.map((eventName) =>
+            client
+              .getContractEvents({ address: vault, abi: mosaicVaultAbi, eventName, fromBlock: from, toBlock: to })
+              .then((logs) => logs.map((l) => ({ kind: eventName, log: l as Log & { args?: Record<string, unknown> } })))
+              .catch(() => []),
+          ),
+        );
+        for (const r of round) {
+          batches.push(r);
+          found += r.length;
+        }
+        if (found >= limit) break; // enough for the page; older history is a click away, not a scroll
+      }
 
       const rows = batches
         .flat()
@@ -122,7 +156,8 @@ export function useVaultActivity(limit = 25) {
 export function useDepositorCount() {
   const chainId = useChainId();
   const client = usePublicClient();
-  const vault = getDeployment(chainId)?.vault as Address | undefined;
+  const deployment = getDeployment(chainId);
+  const vault = deployment?.vault as Address | undefined;
 
   const q = useQuery({
     queryKey: ["depositor-count", chainId, vault],
@@ -131,20 +166,29 @@ export function useDepositorCount() {
     queryFn: async (): Promise<number | undefined> => {
       if (!client || !vault) return undefined;
       const latest = await client.getBlockNumber();
-      const fromBlock = latest > LOOKBACK_BLOCKS ? latest - LOOKBACK_BLOCKS : 0n;
-      const logs = await client.getContractEvents({
-        address: vault,
-        abi: mosaicVaultAbi,
-        eventName: "Deposit",
-        fromBlock,
-        toBlock: latest,
-      });
+      const floor = deployment?.block === undefined ? undefined : BigInt(deployment.block);
+      // Counting depositors means counting all of them. Without a floor to scan back to, or
+      // with history longer than the budget allows, the honest answer is "unknown" rather
+      // than a number that quietly means "since some block".
+      if (floor === undefined) return undefined;
+
       const owners = new Set<string>();
-      for (const l of logs) {
-        const owner = (l as { args?: { owner?: string } }).args?.owner;
-        if (owner) owners.add(owner.toLowerCase());
+      let reachedFloor = false;
+      for (const { from, to } of chunksBackFrom(latest, floor)) {
+        const logs = await client
+          .getContractEvents({ address: vault, abi: mosaicVaultAbi, eventName: "Deposit", fromBlock: from, toBlock: to })
+          .catch(() => null);
+        if (logs === null) return undefined; // a failed chunk means the total cannot be trusted
+        for (const l of logs) {
+          const owner = (l as { args?: { owner?: string } }).args?.owner;
+          if (owner) owners.add(owner.toLowerCase());
+        }
+        if (from === floor) {
+          reachedFloor = true;
+          break;
+        }
       }
-      return owners.size;
+      return reachedFloor ? owners.size : undefined;
     },
   });
 

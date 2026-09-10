@@ -97,7 +97,7 @@ export default function LiveMath() {
                 className={
                   active
                     ? "border border-accent bg-raised px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-50"
-                    : "border border-black/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-600 transition-colors hover:border-black/20 hover:text-zinc-800"
+                    : "inline-flex min-h-8 items-center border border-black/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-600 transition-colors hover:border-black/20 hover:text-zinc-800"
                 }
               >
                 {usd0(c)}

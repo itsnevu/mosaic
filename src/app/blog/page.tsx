@@ -26,10 +26,13 @@ export default function BlogIndex() {
         <ul className="mt-14 border-t border-black/8">
           {posts.map((p) => (
             <li key={p.slug} className="border-b border-black/8">
-              <Link href={`/blog/${p.slug}`} className="group grid gap-3 py-8 md:grid-cols-[150px_minmax(0,1fr)] md:gap-8">
+              <Link
+                href={`/blog/${p.slug}`}
+                className="surface-raise group -mx-4 grid gap-3 px-4 py-8 md:-mx-6 md:grid-cols-[150px_minmax(0,1fr)] md:gap-8 md:px-6"
+              >
                 <span className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.18em] text-zinc-400 md:pt-1.5">
                   {formatDate(p.date)}
-                  <span className="md:block"> · {p.readingTime}</span>
+                  <span className="before:content-['_·_'] md:block md:before:content-none">{p.readingTime}</span>
                 </span>
                 <span>
                   <h2 className="text-[22px] leading-snug tracking-tight text-zinc-900 group-hover:text-accent">

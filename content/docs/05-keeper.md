@@ -34,19 +34,55 @@ Against a local chain, `npm run keeper:local` uses Anvil's default account.
 
 | Variable | Meaning |
 | --- | --- |
-| `RPC_URL` | required |
+| `RPC_URL` | required; comma-separated for failover, tried in order |
 | `KEEPER_PRIVATE_KEY` | required unless `DRY_RUN=1` |
 | `DEPLOYMENT` | path to a deployments json (default: local) |
 | `INTERVAL_MS` | poll interval, default 60 000 |
+| `TICK_TIMEOUT_MS` | abandon a tick that hangs this long, default 120 000 |
 | `POKE_INTERVAL_MS` | max age of a rate sample before poking, default 1h |
 | `NATIVE_USD` | native token price in USD — **without it the gas gate stays at whatever is on-chain** |
 | `COST_MARGIN` | multiplier on the gas estimate, default 1.5 |
+| `MIN_GAS_BALANCE` | alert below this much native token, default 0.05 |
+| `ALERT_WEBHOOK_URL` | POST alerts here; the payload suits Slack and Discord alike |
+| `ALERT_AFTER_FAILURES` | consecutive failures before alerting, default 3 |
+| `HEALTH_PORT` | serve `GET /health` with the last tick's state |
+| `HEARTBEAT_FILE` | write the same state to a file each tick |
+| `INSTANCE` | name for this instance in logs and alerts |
+| `JITTER_MS` | random delay before each tick; set when running more than one instance |
 | `SCORING` | `1` to push scored target weights |
 | `DRY_RUN` | `1` to simulate everything and send nothing |
-| `ONCE` | `1` for a single tick, then exit |
+| `ONCE` | `1` for a single tick, then exit — non-zero exit if that tick failed |
 
 Start with `DRY_RUN=1` against the real chain. It exercises every read and simulation without
 spending anything, and the log tells you exactly what it would have done.
+
+## Staying up
+
+A keeper that dies quietly is worse than one that never ran, so three things are built in.
+
+**It survives an RPC going down.** `RPC_URL` takes a comma-separated list and the client fails
+over in order, ranking endpoints by responsiveness afterwards. With a dead endpoint listed first,
+a tick still completes in about a second.
+
+**It never hangs forever.** Each tick is bounded by `TICK_TIMEOUT_MS` and can never throw out of
+the loop, so a wedged endpoint costs one tick rather than the process.
+
+**It tells somebody.** Point `ALERT_WEBHOOK_URL` at Slack or Discord and it pages on repeated tick
+failures, on a keeper balance too low to pay gas, and on the vault being paused. Alerts are
+deduplicated by cause and resolve themselves, so a persistent problem pages once and recovery is
+announced — an alert channel that repeats itself every minute is one people learn to ignore.
+
+For supervision, `HEALTH_PORT` serves `GET /health` returning 200 or 503 with the last tick's
+state, and `HEARTBEAT_FILE` writes the same JSON to disk. Both mark the keeper unhealthy when a
+tick has not completed within one interval plus one timeout, so a hung process reads as down
+rather than merely quiet.
+
+### Running more than one
+
+Two instances are safe to run at once. Every call is simulated before it is sent, so whichever
+loses the race sees the vault reject the call — cooldown active, nothing to deploy — and skips
+without spending gas. Give each a distinct `INSTANCE` name and a non-zero `JITTER_MS` so they do
+not wake at the same instant.
 
 ## What it cannot do
 
@@ -64,8 +100,8 @@ funds. Withdrawals never depend on it.
 
 ## Operating notes
 
-**Run it as a service.** A crashed keeper is silent. Use a supervisor that restarts it and alerts
-on repeated failures; the tick log is designed to be greppable.
+**Run it as a service.** Use a supervisor that restarts it, and point that supervisor at
+`/health` rather than at the process alone — a wedged keeper still has a live process.
 
 **Do not mix weight-setting modes.** With `SCORING=1` the keeper overwrites manual
 `setTargetWeights` on its next tick. Pick one.

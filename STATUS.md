@@ -22,6 +22,8 @@
 - `DRY_RUN=1`, `ONCE=1`, `SCORING=1`, interval & harga native lewat env (lihat `.env.example`)
 - Terbukti di Anvil: deploy 400k → scoring 40/35/25 → drift 15% → rebalance jalan dengan net +$229,94 vs floor −$352,61
 
+**Keeper tahan mati** — gagal-alih RPC, timeout per tick, alert dengan dedupe, `/health` + heartbeat, aman multi-instance. Diuji: dengan endpoint mati di urutan pertama, satu tick tetap selesai ~1 detik.
+
 **Frontend app** — wagmi + viem
 - `/app` dashboard: TVL, share price, alokasi current vs target per pool, form deposit (approve→deposit) & withdraw
 - **[03] Operations**: kapasitas withdraw sekarang, porsi TVL yang likuid, drift, nilai yang akan dipindah, ekspektasi yield net gas vs batas terburuk, status keeper
@@ -30,7 +32,10 @@
 - **Diverifikasi di browser sungguhan** (headless Chrome): `/`, `/app`, `/docs`, `/privacy`, `/terms` render dengan data chain live, nol console error
 - **Semua angka karangan dihapus dari landing.** Alamat vault palsu `0x4Fa1…9c2E` (dipajang di header, panel "Published numbers" dan footer) diganti alamat deployment sungguhan yang tertaut ke explorer. "USDG → 7 pools · 8.42% APY" di allocation tape dan published numbers jadi live. Worked example ($10.000 × 8,42% = $842) jadi live. Allocation tape sekarang menggambar alokasi vault yang sebenarnya dan menerima jumlah pool berapa pun — sebelumnya layout-nya terkunci di 7 tile karangan.
 - Dua angka karangan dihapus dari landing: "Depositors" sekarang dihitung dari log `Deposit` on-chain, dan kalkulator live-math memakai blended rate vault sungguhan (6,70%), bukan 8,42% hardcode. Fallback saat chain tak terjangkau kini "—", bukan angka palsu yang tampak nyata.
-- **Pass UI terakhir** (diukur lewat CDP, bukan ditebak dari screenshot): overflow horizontal di mobile pada `/whitepaper` dan post blog diperbaiki — `mx-auto` pada grid item mematikan stretch sehingga lebarnya jatuh ke min-content (714px di viewport 390px). Header mobile pindah ke pola dua baris seperti landing page. Daftar isi punya penanda posisi baca. Sel abu-abu menggantung di indeks docs hilang. Empty state dashboard tidak lagi menampilkan `$—` / `— of $—` / `PERFORMANCE FEE — OF YIELD`.
+- **Lapisan material** — kedalaman dipakai hanya untuk keterjelasan fungsi: field deposit/withdraw kini cekung sehingga terbaca menerima input, tombol benar-benar turun saat ditekan, kartu docs terangkat sedikit saat disentuh, dan bar alokasi duduk dalam kanal. Tanpa radius besar dan tanpa blob dua-sumber-cahaya — identitas lama (putih, hairline, mono, biru hanya untuk uang) dipertahankan.
+- **Cacat yang ketemu saat pass ini**: nomor seksi `[06]` dobel (Withdraw dan History), tombol nonaktif tampil sebagai balok abu-abu pekat, `$—` dan `≈ $— OUT` yang lolos, `TVL (totalAssets)` yang jadi `TOTALASSETS` karena uppercase, serta halaman `/privacy` dan `/terms` yang yatim tanpa header/footer dan memajang alamat email `support@mosaic.capital` yang tidak ada. Semua diperbaiki; tombol nonaktif sekarang menyebut alasannya (Connect wallet / Switch network / Deposits paused).
+- **Target sentuh**: dari 34 elemen di bawah 32px di landing page menjadi 6, dan sisanya 31px atau tautan prosa inline. Area sentuh diperbesar lewat padding yang dikompensasi margin negatif, jadi tidak ada yang bergeser.
+- **Pass UI sebelumnya** (diukur lewat CDP, bukan ditebak dari screenshot): overflow horizontal di mobile pada `/whitepaper` dan post blog diperbaiki — `mx-auto` pada grid item mematikan stretch sehingga lebarnya jatuh ke min-content (714px di viewport 390px). Header mobile pindah ke pola dua baris seperti landing page. Daftar isi punya penanda posisi baca. Sel abu-abu menggantung di indeks docs hilang. Empty state dashboard tidak lagi menampilkan `$—` / `— of $—` / `PERFORMANCE FEE — OF YIELD`.
 - `npm run build` ✓ · `tsc` ✓ · `lint` ✓ · scrollWidth = viewport di 390/768/1440px
 
 **Konfigurasi produksi**
@@ -41,8 +46,9 @@
 ## Belum selesai ⏳
 1. **Angka Robinhood Chain yang asli** — semuanya sudah env-driven, tinggal diisi: chain id, RPC, explorer, alamat USDG, dan **alamat + interface pool Turret**. Adapter Turret sendiri belum bisa ditulis sampai interface-nya publik; `IPoolAdapter` adalah kontraknya (7 fungsi, `MockPoolAdapter` jadi contoh implementasi).
 2. **Audit** — belum ada auditor pihak ketiga. `docs/SECURITY.md` + 63 test adalah paket awalnya, bukan penggantinya.
-3. Keeper masih satu hot key tanpa redundansi (kalau mati: yield turun, dana tetap aman dan withdraw tidak bergantung padanya).
-4. Riwayat UI memindai log dalam jendela `NEXT_PUBLIC_LOG_LOOKBACK` (default 100k blok); chain yang ramai butuh indexer.
+3. ~~Keeper satu hot key tanpa redundansi~~ **selesai** — `RPC_URL` menerima daftar dan gagal-alih berurutan, tiap tick dibatasi `TICK_TIMEOUT_MS` dan tidak bisa melempar keluar dari loop, alert ke webhook (Slack/Discord) untuk kegagalan beruntun / saldo gas menipis / vault dijeda dengan dedupe dan pemberitahuan pulih, plus `GET /health` dan heartbeat file untuk supervisor. Dua instance aman dijalankan bersama karena tiap panggilan disimulasikan dulu. Yang tetap: kuncinya masih hot key.
+4. ~~Riwayat UI memindai 100k blok sekaligus~~ **selesai** — kebanyakan RPC membatasi `eth_getLogs` di beberapa ribu blok, jadi pemindaian sekali jalan akan gagal di chain sungguhan. Sekarang berjalan mundur dari kepala dalam potongan (`NEXT_PUBLIC_LOG_CHUNK`, default 10k), berhenti begitu cukup baris, dan dibatasi `NEXT_PUBLIC_LOG_MAX_CHUNKS`. Blok deployment dicatat di deployments json supaya ada dasar pemindaian; tanpa itu jumlah depositor menampilkan "—" alih-alih angka yang diam-diam berarti "sejak blok sekian". **Chain dengan riwayat panjang tetap butuh indexer sungguhan** — ini membuatnya benar dan murah tanpa indexer, bukan menggantikannya.
+5. Target sentuh tersisa di landing page ada di 31px (ambang 32px) — praktis selesai, tapi belum persis memenuhi pedoman.
 
 ## Repo
 `https://github.com/itsnevu/mosaic` — publik, branch `main`. `contracts/lib` (OpenZeppelin + forge-std) ikut di-commit karena dipasang dengan `forge install --no-git`, supaya hasil clone langsung bisa `forge build`.

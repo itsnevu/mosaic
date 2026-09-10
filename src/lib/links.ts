@@ -11,6 +11,11 @@ export const LINKS = {
   telegram: "https://t.me/",
   docs: "/docs",
   blog: "/blog",
+  whitepaper: "/whitepaper",
+  // TODO: replace with the real support address once the mailbox exists. Kept here rather
+  // than inline in the legal pages so publishing it is one line, and so an address nobody
+  // reads is never quietly presented as a support channel.
+  support: "",
   // Live pages in this app:
   app: "/app",
   terms: "/terms",

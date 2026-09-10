@@ -18,7 +18,7 @@ export default function NoticeBar() {
         type="button"
         aria-label="Dismiss beta notice"
         onClick={() => setOpen(false)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-amber-700 transition-colors hover:bg-amber-500/15 hover:text-amber-950"
+        className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded text-amber-700 transition-colors hover:bg-amber-500/15 hover:text-amber-950"
       >
         <CloseX className="h-4 w-4" />
       </button>

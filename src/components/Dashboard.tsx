@@ -80,6 +80,16 @@ export default function Dashboard() {
   const wrongChain = isConnected && walletChainId !== undefined && walletChainId !== stats.chainId;
   const unreachable = stats.hasDeployment && stats.isLoaded && stats.isError;
 
+  /** Why deposits/withdrawals are unavailable, or undefined when they are fine. */
+  function blockedBecause(kind: "deposit" | "withdraw"): string | undefined {
+    if (!stats.hasDeployment) return "Unavailable on this network";
+    if (unreachable) return "Chain unreachable";
+    if (!isConnected) return "Connect wallet";
+    if (wrongChain) return `Switch to ${chainName(stats.chainId)}`;
+    if (kind === "deposit" && stats.paused === true) return "Deposits paused";
+    return undefined;
+  }
+
   const bufferBps =
     stats.totalAssets && stats.totalAssets > 0n && stats.idleAssets !== undefined
       ? Number((stats.idleAssets * BigInt(BPS)) / stats.totalAssets)
@@ -232,7 +242,7 @@ export default function Dashboard() {
               </tbody>
             </table>
             {allocations.length > 0 && (
-              <div className="mt-6 flex h-3 w-full border border-ink">
+              <div className="tape mt-6 flex h-3 w-full gap-px border border-[color:var(--line-strong)] p-px">
                 {allocations.map((a, i) => (
                   <div
                     key={a.adapter}
@@ -289,7 +299,7 @@ export default function Dashboard() {
             address={address}
             allowance={pos.allowance}
             balance={pos.usdgBalance}
-            disabled={!isConnected || !d || wrongChain || stats.paused === true}
+            blockedBecause={blockedBecause("deposit")}
             onDone={() => {
               stats.refetch();
               pos.refetch();
@@ -301,7 +311,7 @@ export default function Dashboard() {
             shares={pos.shares}
             pricePerShare={stats.pricePerShare}
             capacity={ops.withdrawalCapacity}
-            disabled={!isConnected || !d || wrongChain}
+            blockedBecause={blockedBecause("withdraw")}
             onDone={() => {
               stats.refetch();
               pos.refetch();
@@ -330,7 +340,7 @@ function DepositForm({
   address,
   allowance,
   balance,
-  disabled,
+  blockedBecause,
   onDone,
 }: {
   vault?: Address;
@@ -338,9 +348,11 @@ function DepositForm({
   address?: Address;
   allowance?: bigint;
   balance?: bigint;
-  disabled: boolean;
+  /** Set when depositing is unavailable; the reason is shown on the button. */
+  blockedBecause?: string;
   onDone: () => void;
 }) {
+  const disabled = blockedBecause !== undefined;
   const [amount, setAmount] = useState("");
   const [tx, setTx] = useState<TxState>({ kind: "idle" });
   const { mutateAsync: write } = useWriteContract();
@@ -385,7 +397,7 @@ function DepositForm({
         Mint mUSDG at the current price per share. Sits in the buffer until the next batched deployment.
       </p>
       <label className="label block mt-8">Amount (USDG)</label>
-      <div className="mt-2 flex items-stretch border border-ink">
+      <div className="field mt-2 flex items-stretch">
         <input
           inputMode="decimal"
           placeholder="0.00"
@@ -396,16 +408,16 @@ function DepositForm({
         />
         <button
           type="button"
-          className="chip !border-0 !border-l border-ink"
+          className="chip !border-0 !border-l !border-[color:var(--line-strong)] !bg-transparent"
           disabled={disabled || balance === undefined}
           onClick={() => balance !== undefined && setAmount((Number(balance) / 10 ** USDG_DECIMALS).toString())}
         >
           MAX
         </button>
       </div>
-      <p className="label mt-2">Balance ${fmtUsdg(balance)}</p>
-      <button type="button" className="btn btn-fill mt-6 w-full disabled:opacity-40" disabled={!canSubmit} onClick={submit}>
-        {disabled ? "Connect wallet" : needsApproval ? "Approve & deposit" : "Deposit"}
+      <p className="label mt-2">Balance {usd(balance)}</p>
+      <button type="button" className="btn btn-fill mt-6 w-full" disabled={!canSubmit} onClick={submit}>
+        {blockedBecause ?? (needsApproval ? "Approve & deposit" : "Deposit")}
       </button>
       <TxStatus s={tx} />
     </div>
@@ -420,7 +432,7 @@ function WithdrawForm({
   shares,
   pricePerShare,
   capacity,
-  disabled,
+  blockedBecause,
   onDone,
 }: {
   vault?: Address;
@@ -429,9 +441,11 @@ function WithdrawForm({
   pricePerShare?: bigint;
   /** What the vault could pay out right now, across idle and liquid pool balances. */
   capacity?: bigint;
-  disabled: boolean;
+  /** Set when redeeming is unavailable; the reason is shown on the button. */
+  blockedBecause?: string;
   onDone: () => void;
 }) {
+  const disabled = blockedBecause !== undefined;
   const [amount, setAmount] = useState("");
   const [tx, setTx] = useState<TxState>({ kind: "idle" });
   const { mutateAsync: write } = useWriteContract();
@@ -475,7 +489,7 @@ function WithdrawForm({
         or revert.
       </p>
       <label className="label block mt-8">Shares (mUSDG)</label>
-      <div className="mt-2 flex items-stretch border border-ink">
+      <div className="field mt-2 flex items-stretch">
         <input
           inputMode="decimal"
           placeholder="0.0000"
@@ -486,7 +500,7 @@ function WithdrawForm({
         />
         <button
           type="button"
-          className="chip !border-0 !border-l border-ink"
+          className="chip !border-0 !border-l !border-[color:var(--line-strong)] !bg-transparent"
           disabled={disabled || shares === undefined}
           onClick={() => shares !== undefined && setAmount((Number(shares) / 10 ** SHARE_DECIMALS).toString())}
         >
@@ -494,7 +508,7 @@ function WithdrawForm({
         </button>
       </div>
       <p className="label mt-2">
-        You hold {fmtShares(shares)} · ≈ ${fmtUsdg(est)} out{tooMany ? " · exceeds balance" : ""}
+        You hold {fmtShares(shares)} · ≈ {usd(est)} out{tooMany ? " · exceeds balance" : ""}
       </p>
       <p className={`label mt-1 ${overCapacity ? "!text-ink" : ""}`}>
         {overCapacity
@@ -503,8 +517,8 @@ function WithdrawForm({
             ? "Available liquidity unknown."
             : `Vault can serve ${usd(capacity, 0)} right now.`}
       </p>
-      <button type="button" className="btn mt-6 w-full disabled:opacity-40" disabled={!canSubmit} onClick={submit}>
-        {disabled ? "Connect wallet" : overCapacity ? "Above available liquidity" : "Redeem"}
+      <button type="button" className="btn mt-6 w-full" disabled={!canSubmit} onClick={submit}>
+        {blockedBecause ?? (overCapacity ? "Above available liquidity" : "Redeem")}
       </button>
       <TxStatus s={tx} />
     </div>

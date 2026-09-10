@@ -89,6 +89,7 @@ contract DeployProduction is Script {
             "./deployments/production.json",
             string.concat(
                 '{"chainId":', vm.toString(block.chainid),
+                ',"block":', vm.toString(block.number),
                 ',"deployer":"', vm.toString(owner),
                 '","usdg":"', vm.toString(usdg),
                 '","vault":"', vm.toString(address(vault)),

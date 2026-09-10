@@ -401,7 +401,7 @@ export default function Home() {
                     <h3 className="mt-3 text-2xl tracking-tight text-zinc-900">{s.title}</h3>
                     <p className="mt-3 max-w-[46ch] text-base leading-relaxed text-zinc-600">{s.body}</p>
                     <Link
-                      className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-700 hover:text-zinc-900"
+                      className="mt-6 inline-block py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-700 hover:text-zinc-900"
                       href="/app"
                     >
                       Open →
@@ -490,8 +490,11 @@ export default function Home() {
             </div>
             <Faq items={FAQ} />
             <div className="mx-auto max-w-[1400px] px-4 py-10 md:px-8">
-              <Link className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-900" href="/docs">
-                Full docs
+              <Link
+                className="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-600 transition-colors hover:text-zinc-900"
+                href="/docs"
+              >
+                Full docs <span aria-hidden>→</span>
               </Link>
             </div>
           </section>
@@ -559,7 +562,7 @@ export default function Home() {
                   {col.links.map(([href, label]) => (
                     <li key={label}>
                       <a
-                        className="text-sm text-zinc-400 transition-colors hover:text-zinc-50 focus-visible:text-zinc-50 focus-visible:outline-none"
+                        className="-my-2.5 py-2.5 text-sm text-zinc-400 transition-colors hover:text-zinc-50 focus-visible:text-zinc-50 focus-visible:outline-none"
                         href={href}
                       >
                         {label}
@@ -619,11 +622,11 @@ export default function Home() {
                 <span className="text-zinc-50">+</span> One deposit. Many sources of yield. <span className="text-zinc-50">+</span>
               </p>
               <div className="flex gap-4">
-                <Link className="text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/privacy">Privacy</Link>
-                <Link className="text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/terms">Terms</Link>
-                <Link className="text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/docs">Docs</Link>
-                <Link className="text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/whitepaper">Whitepaper</Link>
-                <Link className="text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/blog">Blog</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/privacy">Privacy</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/terms">Terms</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/docs">Docs</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/whitepaper">Whitepaper</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/blog">Blog</Link>
               </div>
             </div>
           </div>

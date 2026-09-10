@@ -17,6 +17,8 @@ export type PoolInfo = {
 
 export type Deployment = {
   chainId: number;
+  /** Block the vault was deployed at, so log scans have a real floor. */
+  block?: number;
   deployer: Address;
   usdg: Address;
   vault: Address;
@@ -39,7 +41,15 @@ function productionDeployment(): Deployment | undefined {
   } catch {
     pools = []; // a malformed list must not take the app down; adapters are read from chain anyway
   }
-  return { chainId, deployer: vault as Address, usdg: usdg as Address, vault: vault as Address, pools };
+  const block = Number(process.env.NEXT_PUBLIC_DEPLOY_BLOCK);
+  return {
+    chainId,
+    block: Number.isInteger(block) && block > 0 ? block : undefined,
+    deployer: vault as Address,
+    usdg: usdg as Address,
+    vault: vault as Address,
+    pools,
+  };
 }
 
 /**

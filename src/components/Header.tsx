@@ -67,7 +67,7 @@ export default function Header() {
       </div>
       <nav className="flex gap-5 overflow-x-auto border-t border-black/8 px-4 py-2.5 text-sm text-zinc-600 md:hidden">
         {NAV.map((n) => (
-          <a key={n.label} href={n.href} className="shrink-0 hover:text-zinc-900">
+          <a key={n.label} href={n.href} className="-my-2 shrink-0 py-2 hover:text-zinc-900">
             {n.label}
           </a>
         ))}
