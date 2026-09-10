@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored Solidity dependencies and Foundry build output — not our source.
+    "contracts/lib/**",
+    "contracts/out/**",
+    "contracts/cache/**",
   ]),
 ]);
 

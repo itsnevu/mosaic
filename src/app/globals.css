@@ -1,26 +1,355 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #ffffff;
+  --bg-alt: #fafafa;
+  --ink: #0a0a0a;
+  --ink-2: #141416;
+  --muted: #6b6b70;
+  --faint: #9a9aa0;
+  --line: #00000014;
+  --line-strong: #0000002e;
+  --accent: #2563eb;
+  --notice: #f4f4f5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+/* mono label */
+.label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 40px;
+  padding: 0 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: transparent;
+  transition: background-color 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--ink); color: #fff; }
+.btn-fill { background: var(--ink); color: #fff; }
+.btn-fill:hover { background: #2a2a2e; }
+.btn-sm { height: 32px; padding: 0 0.9rem; font-size: 10px; }
+
+/* chips */
+.chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.chip:hover { border-color: var(--ink); }
+.chip[data-active="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* slider */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, var(--ink) 0%, var(--ink) var(--pct, 0%), var(--line-strong) var(--pct, 0%), var(--line-strong) 100%);
+  outline: none;
+}
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--ink);
+  cursor: pointer;
+}
+input[type="range"].slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* dotted grid */
+.dotgrid {
+  background-image: radial-gradient(circle, #0000002b 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  background-position: center;
+}
+
+/* giant faded numeral */
+.watermark {
+  position: absolute;
+  top: 0.75rem;
+  right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: clamp(64px, 7vw, 104px);
+  line-height: 1;
+  font-weight: 500;
+  color: #0a0a0a;
+  opacity: 0.06;
+  letter-spacing: -0.04em;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hairline { border-color: var(--line); }
+
+.pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ink);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* =====================================================================
+   Accrued-replica layer (appended). Tokens used by the landing page:
+   bg-background / bg-raised / accent / accent-press / money.
+   ===================================================================== */
+@theme inline {
+  --color-background: #ffffff;
+  --color-raised: #0a0a0a;
+  --color-accent: #0a0a0a;
+  --color-accent-press: #27272a;
+  --color-money: #2563eb;
+}
+
+/* hero slider (Accrued .hero-range, colors inverted) */
+.hero-range {
+  appearance: none;
+  cursor: grab;
+  touch-action: none;
+  background: transparent;
+  height: 100%;
+  margin: 0;
+}
+.hero-range:active { cursor: grabbing; }
+.hero-range:focus-visible { outline: none; }
+.hero-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0a0a0a;
+}
+.hero-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0a0a0a;
+}
+.hero-range::-webkit-slider-thumb {
+  appearance: none;
+  cursor: grab;
+  background: #0a0a0a;
+  border: 2px solid #ffffff;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  transition: transform 0.12s ease-out, background-color 0.12s ease-out;
+}
+.hero-range:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.08); }
+.hero-range::-moz-range-thumb {
+  cursor: grab;
+  background: #0a0a0a;
+  border: 2px solid #ffffff;
+  border-radius: 0;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.12s ease-out, background-color 0.12s ease-out;
+}
+.hero-range:active::-moz-range-thumb { cursor: grabbing; transform: scale(1.08); }
+.hero-range::-webkit-slider-runnable-track { background: transparent; height: 6px; }
+.hero-range::-moz-range-track { background: transparent; border: none; height: 6px; }
+
+/* hero backdrop layers (Accrued .wallet-grid-bg / .desk-glass-canvas, inverted) */
+.wallet-grid-bg {
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.desk-glass-canvas {
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(980px 520px at 8% -12%, rgba(10, 10, 10, 0.07), transparent 58%),
+    radial-gradient(820px 480px at 96% 118%, rgba(10, 10, 10, 0.05), transparent 52%);
+}
+
+/* allocation tape field: dotted grid standing in for Accrued's canvas */
+.tape-dots {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1.3px);
+  background-size: 20px 20px;
+  background-position: 10px 10px;
+}
+/* footer dot field on the black bar */
+.footer-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+}
+
+/* =====================================================================
+   Long-form typography for markdown-backed pages (docs, blog, whitepaper).
+   Scoped to .prose-mosaic so it cannot leak into the app dashboard.
+   ===================================================================== */
+.prose-mosaic {
+  color: #3f3f46;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.prose-mosaic > * + * { margin-top: 1.25rem; }
+.prose-mosaic h2,
+.prose-mosaic h3,
+.prose-mosaic h4 {
+  color: #18181b;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 6rem;
+}
+.prose-mosaic h2 {
+  margin-top: 3.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+.prose-mosaic h3 {
+  margin-top: 2.5rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.prose-mosaic h4 {
+  margin-top: 1.75rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #71717a;
+}
+.prose-mosaic h2:first-child,
+.prose-mosaic h3:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.prose-mosaic a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-mosaic a:hover { color: #18181b; }
+.prose-mosaic strong { color: #18181b; font-weight: 500; }
+.prose-mosaic ul,
+.prose-mosaic ol { padding-left: 1.15rem; }
+.prose-mosaic ul { list-style: none; padding-left: 1.1rem; }
+.prose-mosaic ul > li { position: relative; }
+.prose-mosaic ul > li::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+}
+.prose-mosaic ol { list-style: decimal; }
+.prose-mosaic li + li { margin-top: 0.5rem; }
+.prose-mosaic li > ul,
+.prose-mosaic li > ol { margin-top: 0.5rem; }
+.prose-mosaic blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 0.15rem 0 0.15rem 1.15rem;
+  color: #52525b;
+}
+.prose-mosaic code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.85em;
+  background: #f4f4f5;
+  border: 1px solid var(--line);
+  padding: 0.1em 0.35em;
+  color: #18181b;
+}
+.prose-mosaic pre {
+  background: #fafafa;
+  border: 1px solid var(--line-strong);
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.prose-mosaic pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.prose-mosaic hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+.prose-mosaic table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-mosaic th,
+.prose-mosaic td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.65rem 0.9rem 0.65rem 0;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-mosaic th {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #71717a;
+  font-weight: 400;
+  border-bottom-color: var(--line-strong);
+  white-space: nowrap;
+}
+.prose-mosaic td code { white-space: nowrap; }
+.prose-mosaic input[type="checkbox"] { margin-right: 0.5rem; accent-color: var(--accent); }
