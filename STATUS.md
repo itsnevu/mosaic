@@ -30,7 +30,8 @@
 - **Diverifikasi di browser sungguhan** (headless Chrome): `/`, `/app`, `/docs`, `/privacy`, `/terms` render dengan data chain live, nol console error
 - **Semua angka karangan dihapus dari landing.** Alamat vault palsu `0x4Fa1…9c2E` (dipajang di header, panel "Published numbers" dan footer) diganti alamat deployment sungguhan yang tertaut ke explorer. "USDG → 7 pools · 8.42% APY" di allocation tape dan published numbers jadi live. Worked example ($10.000 × 8,42% = $842) jadi live. Allocation tape sekarang menggambar alokasi vault yang sebenarnya dan menerima jumlah pool berapa pun — sebelumnya layout-nya terkunci di 7 tile karangan.
 - Dua angka karangan dihapus dari landing: "Depositors" sekarang dihitung dari log `Deposit` on-chain, dan kalkulator live-math memakai blended rate vault sungguhan (6,70%), bukan 8,42% hardcode. Fallback saat chain tak terjangkau kini "—", bukan angka palsu yang tampak nyata.
-- `npm run build` ✓ · `tsc` ✓ · `lint` ✓
+- **Pass UI terakhir** (diukur lewat CDP, bukan ditebak dari screenshot): overflow horizontal di mobile pada `/whitepaper` dan post blog diperbaiki — `mx-auto` pada grid item mematikan stretch sehingga lebarnya jatuh ke min-content (714px di viewport 390px). Header mobile pindah ke pola dua baris seperti landing page. Daftar isi punya penanda posisi baca. Sel abu-abu menggantung di indeks docs hilang. Empty state dashboard tidak lagi menampilkan `$—` / `— of $—` / `PERFORMANCE FEE — OF YIELD`.
+- `npm run build` ✓ · `tsc` ✓ · `lint` ✓ · scrollWidth = viewport di 390/768/1440px
 
 **Konfigurasi produksi**
 - `src/lib/chain.ts` tidak lagi placeholder: chain id, RPC, explorer, dan alamat kontrak dibaca dari `NEXT_PUBLIC_*` saat build (`.env.example`). Tanpa env, app jalan di Anvil seperti biasa.
@@ -42,6 +43,9 @@
 2. **Audit** — belum ada auditor pihak ketiga. `docs/SECURITY.md` + 63 test adalah paket awalnya, bukan penggantinya.
 3. Keeper masih satu hot key tanpa redundansi (kalau mati: yield turun, dana tetap aman dan withdraw tidak bergantung padanya).
 4. Riwayat UI memindai log dalam jendela `NEXT_PUBLIC_LOG_LOOKBACK` (default 100k blok); chain yang ramai butuh indexer.
+
+## Repo
+`https://github.com/itsnevu/mosaic` — publik, branch `main`. `contracts/lib` (OpenZeppelin + forge-std) ikut di-commit karena dipasang dengan `forge install --no-git`, supaya hasil clone langsung bisa `forge build`.
 
 ## Cara jalankan lokal
 ```bash
