@@ -4,8 +4,6 @@ import { useState } from "react";
 
 import { useAllocations, useVaultStats } from "@/lib/hooks";
 
-/** Used only until the chain answers, and labelled as illustrative while it is in force. */
-const ILLUSTRATIVE_APY = 0.0842;
 const MIN = 1000;
 const MAX = 250000;
 const STEP = 500;
@@ -24,10 +22,11 @@ export default function LiveMath() {
   const live = stats.hasDeployment && stats.isLoaded && !stats.isError;
   const weightedBps = allocations.reduce((acc, a) => acc + (a.rateBps * a.currentBps) / 10_000, 0);
   const isLive = live && weightedBps > 0;
-  const apy = isLive ? weightedBps / 10_000 : ILLUSTRATIVE_APY;
+  // No rate until the vault answers: a projection off an invented APY would be a claim.
+  const apy = isLive ? weightedBps / 10_000 : undefined;
 
   const pct = ((amount - MIN) / (MAX - MIN)) * 100;
-  const perYear = amount * apy;
+  const perYear = apy === undefined ? undefined : amount * apy;
 
   return (
     <div className="relative max-w-lg border border-black/10 bg-zinc-50/60">
@@ -38,7 +37,7 @@ export default function LiveMath() {
 
       <div className="flex items-center justify-between gap-3 border-b border-black/8 px-4 py-3 sm:px-5">
         <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          Projected · {(apy * 100).toFixed(2)}% APY
+          {apy === undefined ? "Waiting for the vault" : `Projected · ${(apy * 100).toFixed(2)}% APY`}
         </p>
         <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
           <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse bg-accent"></span>
@@ -60,7 +59,7 @@ export default function LiveMath() {
           <div className="sm:text-right">
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">Per year</p>
             <p className="mt-1 font-mono text-2xl tabular-nums tracking-tight text-money transition-[opacity] duration-150 sm:text-3xl">
-              {usd2(perYear)}
+              {perYear === undefined ? "—" : usd2(perYear)}
             </p>
           </div>
         </div>
@@ -107,8 +106,8 @@ export default function LiveMath() {
         </div>
 
         <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-          {isLive ? "Blended rate, live from the vault" : "Illustrative"} · APY moves with pool rates ·{" "}
-          {usd2(100000)} deposit → {usd2(100000 * apy)} / yr
+          {isLive ? "Blended rate, live from the vault" : "No rate until the vault answers"} · APY moves with pool rates ·{" "}
+          {usd2(100000)} deposit → {apy === undefined ? "—" : usd2(100000 * apy)} / yr
         </p>
       </div>
     </div>

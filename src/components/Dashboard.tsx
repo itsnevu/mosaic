@@ -324,7 +324,7 @@ export default function Dashboard() {
 
       <footer className="border-t hairline">
         <div className="mx-auto max-w-[1440px] px-6 sm:px-10 py-5 flex flex-col sm:flex-row gap-3 justify-between label">
-          <span>© 2026 Mosaic Capital · local Anvil deployment (mock USDG, mock pools)</span>
+          <span>© 2026 Mosaic Capital · {stats.hasDeployment ? chainName(stats.chainId) : "no deployment on this network"}</span>
           <span>Yield is realized in price per share. No claim button.</span>
         </div>
       </footer>

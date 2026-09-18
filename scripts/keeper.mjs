@@ -67,7 +67,8 @@ if (!DRY_RUN && !env.KEEPER_PRIVATE_KEY) fail("KEEPER_PRIVATE_KEY is required (o
 const deployment = JSON.parse(
   readFileSync(resolve(root, env.DEPLOYMENT ?? "contracts/deployments/local.json"), "utf8"),
 );
-const { abi } = JSON.parse(readFileSync(join(root, "contracts/out/MosaicVault.sol/MosaicVault.json"), "utf8"));
+// contracts/out never leaves the dev machine; sync-abi.mjs also drops the ABI next to this script.
+const abi = JSON.parse(readFileSync(join(root, "scripts/MosaicVault.abi.json"), "utf8"));
 
 function fail(msg) {
   console.error(`keeper: ${msg}`);

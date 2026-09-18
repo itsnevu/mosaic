@@ -10,6 +10,8 @@ import WorkedExample from "@/components/WorkedExample";
 import AllocationTape from "@/components/AllocationTape";
 import Faq, { type QA } from "@/components/Faq";
 import { ArrowsClockwise, Icon, XLogo, type IconName } from "@/components/icons";
+import { MosaicField } from "@/components/fx/MosaicFieldLoader";
+import { RuleNumbers } from "@/components/RuleNumbers";
 
 /* ------------------------------------------------------------------ data */
 
@@ -94,14 +96,6 @@ const VAULT_SCREENS: { icon: IconName; title: string; body: string }[] = [
   },
 ];
 
-const NUMBERS: { label: string; value: string; body: string }[] = [
-  { label: "Max pool weight", value: "40%", body: "No single pool may exceed this share of the vault, regardless of how attractive it looks." },
-  { label: "Idle buffer target", value: "5–8%", body: "Sized against observed redemptions so the common withdrawal never touches a pool." },
-  { label: "Rebalance threshold", value: "0.5%", body: "Drift below this is allowed to sit. A move must also earn more than it costs." },
-  { label: "Cooldown", value: "24h", body: "A hard wait between rebalances. Two pools trading places cannot make the vault oscillate." },
-  { label: "Performance fee", value: "10% of yield", body: "Charged on yield generated, never on principal, and realized in the price per share." },
-  { label: "Deposit cap", value: "$2,000,000", body: "Conservative during the early period. The amount at stake grows only as the system proves itself." },
-];
 
 const RISKS: { icon: IconName; title: string; body: string }[] = [
   {
@@ -235,6 +229,7 @@ export default function Home() {
           <section className="relative overflow-hidden border-b border-black/8">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 desk-glass-canvas opacity-60"></div>
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 wallet-grid-bg opacity-[0.35]"></div>
+            <MosaicField />
             <div className="relative mx-auto grid min-h-[min(100dvh,920px)] max-w-[1400px] grid-cols-1 items-center gap-12 px-4 py-14 sm:py-16 md:grid-cols-[1.08fr_0.92fr] md:gap-10 md:px-8 md:py-20">
               <div className="min-w-0">
                 <Tag>[01] Auto-optimized yield</Tag>
@@ -427,18 +422,7 @@ export default function Home() {
               </p>
             </div>
             <div className="mx-auto grid max-w-[1400px] grid-cols-1 border-t border-black/8 md:grid-cols-2">
-              {NUMBERS.map((n, i) => (
-                <article
-                  key={n.label}
-                  className={`border-b border-black/8 px-4 py-12 md:px-8 md:py-16 ${i % 2 === 0 ? "md:border-r" : ""}`}
-                >
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">{n.label}</p>
-                  <p className="mt-4 font-mono text-4xl tabular-nums tracking-tighter text-zinc-900 sm:text-5xl md:text-6xl">
-                    {n.value}
-                  </p>
-                  <p className="mt-4 max-w-[46ch] text-base leading-relaxed text-zinc-600">{n.body}</p>
-                </article>
-              ))}
+              <RuleNumbers />
             </div>
           </section>
 

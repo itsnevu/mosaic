@@ -262,3 +262,48 @@ export function useBlendedApy(): number | undefined {
   const weightedBps = allocations.reduce((acc, a) => acc + (a.rateBps * a.currentBps) / 10_000, 0);
   return live && weightedBps > 0 ? weightedBps / 10_000 : undefined;
 }
+
+/* ------------------------------------------------------------------ vault parameters */
+
+export type VaultRules = {
+  maxWeightBps?: number;
+  bufferTargetBps?: number;
+  rebalanceThresholdBps?: number;
+  rebalanceCooldownSec?: number;
+  performanceFeeBps?: number;
+  /** USDG, 6 dp */
+  depositCap?: bigint;
+  isLoaded: boolean;
+  hasDeployment: boolean;
+};
+
+/**
+ * The rule set as the vault holds it right now — owner-tunable, so the landing reads it rather
+ * than quoting the deploy-time defaults.
+ */
+export function useVaultRules(): VaultRules {
+  const chainId = useChainId();
+  const deployment = getDeployment(chainId);
+  const vault = deployment?.vault;
+  const fns = ["defaultMaxWeightBps", "bufferTargetBps", "rebalanceThresholdBps", "rebalanceCooldown", "performanceFeeBps", "depositCap"] as const;
+  const { data, isLoading } = useReadContracts({
+    contracts: vault ? fns.map((functionName) => ({ address: vault, abi: mosaicVaultAbi, functionName })) : [],
+    allowFailure: true,
+    query: { enabled: !!vault, refetchInterval: 30_000 },
+  });
+  const r = (i: number) => {
+    const x = data?.[i];
+    return x && x.status === "success" ? x.result : undefined;
+  };
+  const num = (v: unknown) => (v === undefined ? undefined : Number(v));
+  return {
+    maxWeightBps: num(r(0)),
+    bufferTargetBps: num(r(1)),
+    rebalanceThresholdBps: num(r(2)),
+    rebalanceCooldownSec: num(r(3)),
+    performanceFeeBps: num(r(4)),
+    depositCap: r(5) as bigint | undefined,
+    isLoaded: !!vault && !isLoading && data !== undefined,
+    hasDeployment: !!deployment,
+  };
+}

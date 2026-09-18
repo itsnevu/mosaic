@@ -6,9 +6,9 @@
  * rather than a hunt through the markup.
  */
 export const LINKS = {
-  // TODO: replace with the real Mosaic handles once the accounts exist.
-  x: "https://x.com/",
-  telegram: "https://t.me/",
+  x: "https://x.com/mosaic_capital",
+  // TODO: no Telegram yet; the footer hides the icon while this is empty.
+  telegram: "",
   docs: "/docs",
   blog: "/blog",
   whitepaper: "/whitepaper",

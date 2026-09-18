@@ -22,3 +22,6 @@ for (const [artifact, exportName, file] of CONTRACTS) {
   writeFileSync(join(DEST, file), body);
   console.log(`wrote src/lib/abi/${file} (${abi.length} entries)`);
 }
+
+// Keep a plain-JSON copy for scripts/keeper.mjs, which runs on the server without contracts/out.
+writeFileSync(resolve(root, "scripts/MosaicVault.abi.json"), JSON.stringify(JSON.parse(readFileSync(resolve(root, "contracts/out/MosaicVault.sol/MosaicVault.json"), "utf8")).abi, null, 2) + "\n");
