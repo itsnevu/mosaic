@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-09 Three failure modes</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1920px; --h: 1080px; }
+  .head { position: absolute; left: 96px; right: 96px; top: 96px; display: flex; justify-content: space-between; align-items: flex-end; gap: 80px; }
+  h2 { font-size: 118px; margin-top: 26px; max-width: 14ch; }
+  .lede { max-width: 40ch; font-size: 22px; padding-bottom: 12px; }
+  .cols { position: absolute; left: 96px; right: 96px; top: 470px; bottom: 130px; display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .col { position: relative; padding: 44px 40px 44px 0; border-right: 1px solid var(--line); overflow: hidden; }
+  .col + .col { padding-left: 40px; }
+  .col:last-child { border-right: 0; padding-right: 0; }
+  .col .numeral { right: -8px; bottom: 10px; font-size: 300px; }
+  .col .ih { display: flex; align-items: center; gap: 16px; color: var(--accent); position: relative; margin-top: 8px; }
+  .col h3 { font-weight: 400; font-size: 44px; letter-spacing: -.03em; line-height: 1.05; color: var(--zinc-900); margin-top: 28px; max-width: 14ch; position: relative; }
+  .col p.b { margin-top: 24px; font-size: 20px; line-height: 1.55; color: var(--zinc-600); max-width: 40ch; position: relative; }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 52px; display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+<div class="kv">
+  <div class="head">
+    <div>
+      <p class="tag">[08] Where the risk lives</p>
+      <h2>Three failure modes. Named.</h2>
+    </div>
+    <p class="lede">Anyone describing a yield product without naming its failure modes is describing a brochure. There are three real ones, and each has a bounded answer.</p>
+  </div>
+
+  <div class="cols">
+    <div class="col"><span class="numeral">01</span>
+      <div class="ih"><span data-icon="stack"></span><span class="tag">01</span></div>
+      <h3>Underlying pools</h3>
+      <p class="b">Mosaic supplies USDG to lending protocols. If one suffers a critical failure, the capital in that pool is at risk. Allocation is spread and capped so a failing pool scratches the portfolio, not erases it.</p>
+    </div>
+    <div class="col"><span class="numeral">02</span>
+      <div class="ih"><span data-icon="shield"></span><span class="tag">02</span></div>
+      <h3>Mosaic's contracts</h3>
+      <p class="b">Pooled capital is a target. The mitigation is a small core that does not change, complexity pushed into adapters that can be disabled individually, independent audits, a conservative cap, and an emergency withdraw path.</p>
+    </div>
+    <div class="col"><span class="numeral">03</span>
+      <div class="ih"><span data-icon="scales"></span><span class="tag">03</span></div>
+      <h3>Allocation model</h3>
+      <p class="b">A model can be well-built and still misjudge, so it is bounded rather than trusted. Weight ceilings, pool caps, cooldowns and profitability checks make a bad decision expensive to no one and survivable by everyone.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="wordmark"><img src="mosaiclogo.jpg" width="30" height="30" alt=""><span>Mosaic</span></div>
+    <p class="label">Max pool weight 40% · Deposit cap $2,000,000 · Emergency withdraw path</p>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+/* Mosaic key-visual tokens — lifted from src/app/globals.css so the visuals match the site 1:1.
+   Every frame is a fixed-size .kv box; edit --w/--h per file, never here. */
+@font-face { font-family: "Geist"; src: url("fonts/geist.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+
+:root {
+  --bg: #ffffff;
+  --bg-alt: #fafafa;
+  --ink: #0a0a0a;
+  --ink-2: #141416;
+  --muted: #6b6b70;
+  --faint: #9a9aa0;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.18);
+  --accent: #2563eb;
+  --money: #2563eb;
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --lift-2: 0 1px 1px rgb(9 9 11 / 0.04), 0 8px 20px rgb(9 9 11 / 0.07);
+  --well: inset 0 1px 2px rgb(9 9 11 / 0.09), inset 0 0 0 1px rgb(9 9 11 / 0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden; }
+body {
+  color: var(--ink);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1;
+}
+
+.kv {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--zinc-800);
+}
+.kv.dark { background: var(--ink); color: var(--zinc-200); }
+
+/* ---- type ---- */
+.mono { font-family: "Geist Mono", ui-monospace, monospace; }
+.tag {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+.tag.muted { color: var(--zinc-500); }
+.tag.light { color: var(--zinc-50); }
+.label {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--zinc-500);
+}
+h1, h2 {
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--zinc-900);
+}
+.dark h1, .dark h2 { color: var(--zinc-50); }
+.lede { font-size: 22px; line-height: 1.55; color: var(--zinc-600); }
+.dark .lede { color: var(--zinc-400); }
+.figure {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.money { color: var(--money); }
+
+/* ---- backdrops (verbatim from the site) ---- */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.glass {
+  background-image:
+    radial-gradient(980px 520px at 8% -12%, rgba(10, 10, 10, 0.07), transparent 58%),
+    radial-gradient(820px 480px at 96% 118%, rgba(10, 10, 10, 0.05), transparent 52%);
+}
+.tape-dots {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1.3px);
+  background-size: 20px 20px;
+  background-position: 10px 10px;
+}
+.footer-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+}
+.layer { position: absolute; inset: 0; pointer-events: none; }
+
+/* ---- rules ---- */
+.hair { border-color: var(--line); }
+.hair-t { border-top: 1px solid var(--line); }
+.hair-b { border-bottom: 1px solid var(--line); }
+.hair-r { border-right: 1px solid var(--line); }
+.dark .hair-t, .dark .hair-b, .dark .hair-r { border-color: rgba(255, 255, 255, 0.08); }
+
+/* ---- controls ---- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 44px;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  white-space: nowrap;
+}
+.btn-raised { background: var(--ink); color: var(--zinc-100); border: 1px solid rgba(0, 0, 0, 0.35); }
+.btn-outline { border: 1px solid rgba(0, 0, 0, 0.12); color: var(--zinc-800); }
+.btn-accent { background: var(--accent); color: var(--zinc-50); }
+.btn-white { background: var(--zinc-50); color: var(--zinc-900); }
+.dark .btn-outline { border-color: rgba(255, 255, 255, 0.12); color: var(--zinc-200); }
+/* the header / footer CTA "bumpers" */
+.bumper::before, .bumper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 16px;
+  transform: translateY(-50%);
+  background: var(--bumper, var(--accent));
+}
+.bumper::before { left: -8px; }
+.bumper::after { right: -8px; }
+.btn-white.bumper { --bumper: var(--zinc-50); }
+.btn-accent.bumper { --bumper: var(--accent); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  background: rgba(37, 99, 235, 0.05);
+  padding: 8px 14px;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+
+/* ---- corner-bracket panel (footer aside) ---- */
+.bracket { position: relative; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.05); }
+.bracket > i { position: absolute; width: 14px; height: 14px; border: 0 solid var(--zinc-50); }
+.bracket > i:nth-child(1) { left: -1px; top: -1px; border-left-width: 1px; border-top-width: 1px; }
+.bracket > i:nth-child(2) { right: -1px; top: -1px; border-right-width: 1px; border-top-width: 1px; }
+.bracket > i:nth-child(3) { left: -1px; bottom: -1px; border-left-width: 1px; border-bottom-width: 1px; }
+.bracket > i:nth-child(4) { right: -1px; bottom: -1px; border-right-width: 1px; border-bottom-width: 1px; }
+.bracket.on-light { border-color: var(--line); background: var(--bg); }
+.bracket.on-light > i { border-color: var(--ink); }
+
+/* ---- wordmark ---- */
+.wordmark { display: inline-flex; align-items: center; gap: 14px; }
+.wordmark img { display: block; border-radius: 2px; object-fit: cover; }
+.wordmark span {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  color: var(--zinc-900);
+}
+.dark .wordmark span { color: var(--zinc-50); }
+/* on black, invert the jpg and screen it so the white square disappears */
+.dark .wordmark img.knockout, img.knockout { filter: invert(1); mix-blend-mode: screen; }
+img.multiply { mix-blend-mode: multiply; }
+
+/* ---- watermark numeral (numbered cards) ---- */
+.numeral {
+  position: absolute;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.05);
+  user-select: none;
+}
+.dark .numeral { color: rgba(255, 255, 255, 0.06); }
+
+/* ---- pulse dot ---- */
+.pulse { display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: var(--accent); }
+
+/* ---- icon ---- */
+svg.icon { width: 28px; height: 28px; fill: currentColor; display: block; }

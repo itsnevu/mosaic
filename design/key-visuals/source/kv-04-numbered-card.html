@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-04 Numbered card</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1080px; --h: 1350px; }
+  .numeral { right: -30px; top: 40px; font-size: 640px; }
+  .top { position: absolute; left: 64px; right: 64px; top: 64px; display: flex; justify-content: space-between; align-items: center; }
+  .card { position: absolute; left: 64px; right: 64px; top: 460px; }
+  .head { display: flex; align-items: center; gap: 18px; color: var(--accent); }
+  h2 { font-size: 104px; margin-top: 36px; max-width: 12ch; }
+  .lede { margin-top: 40px; max-width: 40ch; font-size: 26px; }
+  .rule { margin-top: 56px; width: 120px; height: 2px; background: var(--accent); }
+  .bottom { position: absolute; left: 64px; right: 64px; bottom: 64px; border-top: 1px solid var(--line); padding-top: 24px; display: flex; justify-content: space-between; }
+  .steps { display: flex; gap: 28px; }
+  .steps span { font-family: "Geist Mono"; font-size: 14px; letter-spacing: .18em; color: var(--zinc-400); }
+  .steps span.on { color: var(--zinc-900); }
+</style>
+</head>
+<body>
+<div class="kv">
+  <span class="numeral">02</span>
+  <div class="top">
+    <div class="wordmark"><img src="mosaiclogo.jpg" width="28" height="28" alt=""><span>Mosaic</span></div>
+    <p class="tag muted">[04] How it earns</p>
+  </div>
+
+  <div class="card">
+    <div class="head"><span data-icon="coins"></span><span class="tag">02</span></div>
+    <h2>Receive shares, not rewards.</h2>
+    <p class="lede">You get deposit ÷ price-per-share in shares. Yield arrives as that price rising. Same shares in month six, worth more USDG.</p>
+    <div class="rule"></div>
+  </div>
+
+  <div class="bottom">
+    <div class="steps"><span>01</span><span class="on">02</span><span>03</span><span>04</span><span>05</span><span>06</span></div>
+    <p class="label">Six steps · one ledger · nothing to claim</p>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>

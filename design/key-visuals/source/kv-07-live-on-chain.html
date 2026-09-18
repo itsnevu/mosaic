@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-07 Live on Robinhood Chain</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1920px; --h: 1080px; }
+  .field { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 55%, #000 100%); mask-image: linear-gradient(180deg, transparent 0%, transparent 55%, #000 100%); }
+  .field canvas { width: 100%; height: 100%; display: block; }
+  .top { position: absolute; left: 96px; right: 96px; top: 56px; display: flex; justify-content: space-between; align-items: center; }
+  .left { position: absolute; left: 96px; top: 200px; width: 980px; }
+  h1 { font-size: 132px; margin-top: 32px; max-width: 12ch; }
+  .lede { margin-top: 40px; max-width: 48ch; font-size: 23px; }
+  .ledger { position: absolute; right: 96px; top: 200px; width: 620px; padding: 36px 40px; }
+  .ledger .r { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .ledger .r:last-child { border-bottom: 0; }
+  .ledger dd { font-family: "Geist Mono"; font-size: 20px; letter-spacing: -.01em; color: var(--zinc-900); text-align: right; }
+  .ledger dd.money { color: var(--money); }
+  .venues { margin-top: 10px; }
+  .venues .r { padding: 12px 0; border-bottom: 1px dashed var(--line); }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+<div class="kv">
+  <div class="layer glass" style="opacity:.6"></div>
+  <div class="field"><canvas data-field='{"cols":96,"t":0.6,"seed":5,"alpha":0.7}'></canvas></div>
+
+  <div class="top">
+    <div class="wordmark"><img src="mosaiclogo.jpg" width="30" height="30" alt=""><span>Mosaic</span></div>
+    <span class="pill"><span class="pulse"></span>Live · Robinhood Chain mainnet</span>
+  </div>
+
+  <div class="left">
+    <p class="tag">[00] Announcement</p>
+    <h1>Live on Robinhood Chain.</h1>
+    <p class="lede">One deposit, three Morpho vaults, and a share price that only moves when the chain says it moved. No projections, no illustrative numbers.</p>
+  </div>
+
+  <aside class="ledger bracket on-light"><i></i><i></i><i></i><i></i>
+    <p class="tag muted">What your USDG does</p>
+    <dl style="margin-top:18px">
+      <div class="r"><dt class="label">Chain</dt><dd>Robinhood Chain · 4663</dd></div>
+      <div class="r"><dt class="label">Asset</dt><dd>USDG</dd></div>
+      <div class="r"><dt class="label">Vault</dt><dd>0xFB20…5A6f</dd></div>
+      <div class="r" style="border-bottom:0;padding-bottom:6px"><dt class="label">Venues · target</dt></div>
+      <div class="venues">
+        <div class="r"><dt class="mono" style="font-size:16px;color:var(--zinc-700)">Steakhouse USDG</dt><dd class="money">40%</dd></div>
+        <div class="r"><dt class="mono" style="font-size:16px;color:var(--zinc-700)">Ethena × Steakhouse USDG</dt><dd class="money">35%</dd></div>
+        <div class="r" style="border-bottom:1px solid var(--line)"><dt class="mono" style="font-size:16px;color:var(--zinc-700)">NetNet Credit</dt><dd class="money">25%</dd></div>
+      </div>
+      <div class="r"><dt class="label">Deposit cap</dt><dd>$2,000,000</dd></div>
+      <div class="r"><dt class="label">Contracts</dt><dd>Verified on explorer</dd></div>
+    </dl>
+  </aside>
+
+  <div class="foot">
+    <span class="btn btn-raised">Deposit USDG</span>
+    <p class="label" style="background:#fff;padding:8px 12px">Every figure on the site is read from the chain when the page loads</p>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>

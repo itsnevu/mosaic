@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-03 Rules, not vibes</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1920px; --h: 1080px; }
+  .left { position: absolute; left: 96px; top: 120px; width: 900px; }
+  h2 { font-size: 150px; margin-top: 28px; max-width: 12ch; }
+  .lede { margin-top: 44px; max-width: 46ch; font-size: 23px; }
+  .ctas { margin-top: 56px; display: flex; gap: 22px; }
+  .panel { position: absolute; right: 96px; top: 120px; width: 640px; padding: 40px 44px; }
+  .panel dl { margin-top: 36px; border-top: 1px solid rgba(255,255,255,.08); }
+  .panel .r { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .panel dd { font-family: "Geist Mono"; font-size: 34px; letter-spacing: -.03em; color: var(--zinc-100); }
+  .panel dd small { font-size: 16px; letter-spacing: 0; color: var(--zinc-500); margin-left: 8px; }
+  .bottom { position: absolute; left: 96px; right: 96px; bottom: 56px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; }
+</style>
+</head>
+<body>
+<div class="kv dark">
+  <div class="layer footer-dots" style="opacity:.6"></div>
+
+  <div class="left">
+    <p class="tag muted">[07] Published numbers</p>
+    <h2>Rules,<br>not vibes.</h2>
+    <p class="lede">Ceilings, buffer, threshold and fee are the live allocation rule. They can be tightened. The keeper cannot step around them.</p>
+    <div class="ctas">
+      <span class="btn btn-white bumper">Open vault</span>
+      <span class="btn btn-outline">Read the docs</span>
+    </div>
+  </div>
+
+  <aside class="panel bracket"><i></i><i></i><i></i><i></i>
+    <p class="tag light">The rule set is the product</p>
+    <dl>
+      <div class="r"><dt class="label">Max pool weight</dt><dd>40%</dd></div>
+      <div class="r"><dt class="label">Idle buffer target</dt><dd>5%</dd></div>
+      <div class="r"><dt class="label">Rebalance threshold</dt><dd>0.5%</dd></div>
+      <div class="r"><dt class="label">Cooldown</dt><dd>24h</dd></div>
+      <div class="r"><dt class="label">Performance fee</dt><dd>10%<small>of yield</small></dd></div>
+      <div class="r"><dt class="label">Deposit cap</dt><dd>$2,000,000</dd></div>
+    </dl>
+  </aside>
+
+  <div class="bottom">
+    <div class="wordmark"><img class="knockout" src="mosaiclogo.jpg" width="30" height="30" alt=""><span>Mosaic</span></div>
+    <p class="label">Vault · <span style="text-transform:none">0xFB20…5A6f</span> · verified on Robinhood Chain</p>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>

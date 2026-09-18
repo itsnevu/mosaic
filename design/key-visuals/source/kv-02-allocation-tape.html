@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-02 Allocation tape</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1080px; --h: 1080px; }
+  .top { position: absolute; left: 56px; right: 56px; top: 56px; display: flex; justify-content: space-between; align-items: center; }
+  .frame { position: absolute; left: 56px; right: 56px; top: 150px; height: 560px; border: 1px solid var(--line); padding: 14px; }
+  .tree { display: flex; gap: 6px; height: 100%; }
+  .col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .cell { position: relative; display: flex; flex-direction: column; justify-content: space-between; background: var(--accent); padding: 16px 18px; min-height: 0; }
+  .cell .n { font-family: "Geist Mono"; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; color: var(--zinc-100); }
+  .cell .w { font-family: "Geist Mono"; font-size: 30px; letter-spacing: -.02em; color: rgba(228,228,231,.7); }
+  .cell.ghost { background: rgba(255,255,255,.4); border: 1px solid rgba(0,0,0,.35); }
+  .cell.ghost .n { color: var(--zinc-900); } .cell.ghost .w { color: var(--zinc-600); }
+  .strip { display: flex; align-items: center; justify-content: space-between; background: var(--accent); padding: 0 18px; }
+  .strip .n { font-family: "Geist Mono"; font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--zinc-100); }
+  .strip .w { font-family: "Geist Mono"; font-size: 15px; color: rgba(228,228,231,.7); }
+  .bottom { position: absolute; left: 56px; right: 56px; bottom: 56px; }
+  h2 { font-size: 92px; margin-top: 22px; }
+  .row { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+  .lede { max-width: 30ch; font-size: 19px; }
+</style>
+</head>
+<body>
+<div class="kv">
+  <div class="top">
+    <div class="wordmark"><img src="mosaiclogo.jpg" width="28" height="28" alt=""><span>Mosaic</span></div>
+    <span class="pill"><span class="pulse"></span>Live now</span>
+  </div>
+
+  <div class="frame tape-dots">
+    <div class="tree">
+      <div class="col" style="flex:40">
+        <div class="cell" style="flex:40"><span class="n">Steakhouse USDG</span><span class="w">40%</span></div>
+      </div>
+      <div class="col" style="flex:65">
+        <div class="cell" style="flex:35"><span class="n">Ethena × Steakhouse USDG</span><span class="w">35%</span></div>
+        <div class="cell" style="flex:25"><span class="n">NetNet Credit</span><span class="w">25%</span></div>
+        <div class="strip" style="flex:5"><span class="n">Idle buffer</span><span class="w">5%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="row">
+      <div>
+        <p class="tag">[02] Allocation</p>
+        <h2>Spread thin.<br>Earn more.</h2>
+      </div>
+      <p class="lede">Weights follow a risk-adjusted score. Hard ceilings override the weights. The keeper moves only when the move pays.</p>
+    </div>
+    <p class="label" style="margin-top:34px;border-top:1px solid var(--line);padding-top:18px">Target weights · read from the vault, not written down</p>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>

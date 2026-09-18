@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KV-08 Worked example</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  .kv { --w: 1080px; --h: 1920px; }
+  .top { position: absolute; left: 64px; right: 64px; top: 72px; display: flex; justify-content: space-between; align-items: center; }
+  .head { position: absolute; left: 64px; right: 64px; top: 200px; }
+  h2 { font-size: 94px; margin-top: 28px; }
+  .big { margin-top: 44px; font-size: 168px; color: var(--money); }
+  .sub { margin-top: 18px; }
+  .rail { position: absolute; left: 64px; right: 64px; top: 760px; border-top: 1px solid var(--line); }
+  .step { display: grid; grid-template-columns: 90px 1fr auto; gap: 24px; align-items: baseline; padding: 30px 0; border-bottom: 1px solid var(--line); }
+  .step .n { font-family: "Geist Mono"; font-size: 15px; letter-spacing: .22em; color: var(--accent); }
+  .step .t { font-size: 30px; letter-spacing: -.02em; color: var(--zinc-900); }
+  .step .t small { display: block; font-size: 18px; color: var(--zinc-500); margin-top: 6px; letter-spacing: 0; }
+  .step .v { font-family: "Geist Mono"; font-size: 34px; letter-spacing: -.03em; color: var(--zinc-900); text-align: right; white-space: nowrap; }
+  .step .v.money { color: var(--money); }
+  .tape { display: flex; gap: 4px; height: 26px; width: 340px; }
+  .tape span { background: var(--accent); }
+  .tape span.b { background: var(--zinc-300); }
+  .bottom { position: absolute; left: 64px; right: 64px; bottom: 72px; }
+  .bottom .lede { max-width: 42ch; font-size: 22px; }
+  .ctas { margin-top: 36px; display: flex; gap: 20px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="kv">
+  <div class="layer grid-bg" style="opacity:.3"></div>
+  <div class="top">
+    <div class="wordmark"><img src="mosaiclogo.jpg" width="28" height="28" alt=""><span>Mosaic</span></div>
+    <p class="tag muted">Worked example</p>
+  </div>
+
+  <div class="head">
+    <p class="tag">[04] How it earns</p>
+    <h2>Ten thousand USDG.<br>Ten thousand shares.</h2>
+    <p class="figure big">$10,000</p>
+    <p class="label sub">Deposited once · priced once into shares</p>
+  </div>
+
+  <div class="rail">
+    <div class="step"><span class="n">01</span><span class="t">Deposit USDG<small>One approval, one transaction.</small></span><span class="v">10,000.00</span></div>
+    <div class="step"><span class="n">02</span><span class="t">Price per share<small>Assets ÷ shares. Starts at one.</small></span><span class="v">1.0000</span></div>
+    <div class="step"><span class="n">03</span><span class="t">Shares minted<small>Deposit ÷ price. Never dilutes anyone.</small></span><span class="v">10,000.00</span></div>
+    <div class="step"><span class="n">04</span><span class="t">Spread by score<small>40 / 35 / 25, buffer 5.</small></span><span class="tape"><span style="flex:40"></span><span style="flex:35"></span><span style="flex:25"></span><span class="b" style="flex:5"></span></span></div>
+    <div class="step"><span class="n">05</span><span class="t">Month six<small>Same shares. Price per share rose.</small></span><span class="v money">↗ worth more</span></div>
+  </div>
+
+  <div class="bottom">
+    <p class="lede">Yield never lands as a token you collect; the price per share simply carries it. Nothing to claim, nothing to remember.</p>
+    <div class="ctas">
+      <span class="btn btn-raised">Deposit USDG</span>
+      <span class="label">Before the 10% performance fee on yield</span>
+    </div>
+  </div>
+</div>
+<script src="kv.js"></script>
+</body>
+</html>
