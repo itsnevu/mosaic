@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { LINKS } from "@/lib/links";
 import { HeroStats } from "@/components/HeroStats";
-import NoticeBar from "@/components/NoticeBar";
 import Header, { Wordmark } from "@/components/Header";
 import LiveMath from "@/components/LiveMath";
 import VaultAddress from "@/components/VaultAddress";
@@ -221,7 +220,6 @@ const outlineBtn = "inline-flex items-center justify-center " + outlineBtnBase;
 export default function Home() {
   return (
     <div className="min-h-full overflow-x-clip bg-background font-sans text-zinc-800">
-      <NoticeBar />
       <div className="min-h-[100dvh]">
         <Header />
 
