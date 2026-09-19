@@ -33,6 +33,9 @@ function buildProductionChain(): Chain | undefined {
     name: ENV.chainName || "Robinhood Chain",
     nativeCurrency: { name: symbol, symbol, decimals: 18 },
     rpcUrls: { default: { http: [ENV.rpcUrl] } },
+    // Multicall3 sits at its canonical address on Robinhood Chain (the LIQUOR indexer reads
+    // through it). With it registered, a useReadContracts of ten views is one eth_call.
+    contracts: { multicall3: { address: "0xcA11bde05977b3631167028862bE2a173976CA11" } },
     ...(ENV.explorerUrl ? { blockExplorers: { default: { name: "Explorer", url: ENV.explorerUrl } } } : {}),
   });
 }
