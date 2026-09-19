@@ -45,3 +45,6 @@ next-env.d.ts
 /contracts/cache/
 /contracts/broadcast/
 !.env.example
+
+# internal content brief, never published
+design/PROJECT-BRIEF.md
