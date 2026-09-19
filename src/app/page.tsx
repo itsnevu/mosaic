@@ -11,6 +11,7 @@ import AllocationTape from "@/components/AllocationTape";
 import Faq, { type QA } from "@/components/Faq";
 import { ArrowsClockwise, Icon, XLogo, type IconName } from "@/components/icons";
 import { MosaicField } from "@/components/fx/MosaicFieldLoader";
+import { TickerMosaic } from "@/components/fx/TickerMosaicLoader";
 import { RuleNumbers } from "@/components/RuleNumbers";
 
 /* ------------------------------------------------------------------ data */
@@ -282,6 +283,74 @@ export default function Home() {
                   {w}
                 </div>
               ))}
+            </div>
+          </section>
+
+          {/* ============================== [03] $MOSAIC */}
+          <section id="mosaic" className="scroll-mt-16 border-t border-black/8 bg-raised text-zinc-100">
+            <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-14 gap-y-10 px-4 py-16 md:grid-cols-[0.9fr_1.1fr] md:grid-rows-[auto_auto] md:items-center md:px-8 md:py-24">
+              <div className="min-w-0 md:col-start-1 md:row-start-1 md:self-end">
+                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--accent)]">[03] Roadmap · the fee&rsquo;s second job</p>
+                <h2 className="mt-5 max-w-[14ch] text-3xl tracking-tighter leading-[1.02] text-zinc-50 sm:text-4xl md:text-[3.25rem] md:leading-[1.02]">
+                  The fee will buy back{" "}
+                  <span className="whitespace-nowrap font-mono font-medium tracking-tight text-[var(--accent)]">$MOSAIC</span>.
+                </h2>
+              </div>
+
+              <div className="min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:self-center">
+                <div className="relative border border-white/12">
+                  <TickerMosaic />
+                </div>
+                <div className="mt-3 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                  <span>Many fragments. One ticker.</span>
+                  <span>Tap to scatter</span>
+                </div>
+              </div>
+
+              <div className="min-w-0 md:col-start-1 md:row-start-2 md:self-start">
+                <p className="max-w-[54ch] text-base leading-relaxed text-zinc-400 md:text-[17px] md:leading-relaxed">
+                  Mosaic charges ten percent of yield and nothing else. The plan is for a published share of that fee to buy
+                  <span className="font-mono text-zinc-200"> $MOSAIC</span> on the open market each time it accrues, and to
+                  report every purchase the way the vault reports every rebalance: as an event anyone can read.
+                </p>
+
+                <ol className="mt-10 grid grid-cols-1 gap-0 border-t border-white/10 sm:grid-cols-3">
+                  {[
+                    ["01", "Yield is earned", "The share price rises. Nothing else counts as revenue."],
+                    ["02", "The fee accrues", "10% of the gain above the high-water mark, minted as mUSDG."],
+                    ["03", "A share buys $MOSAIC", "On the open market, on a published schedule, logged on-chain."],
+                  ].map(([n, h, b]) => (
+                    <li
+                      key={n}
+                      className="border-b border-white/10 py-5 sm:border-b-0 sm:border-r sm:pr-5 sm:last:border-r-0 sm:[&:not(:first-child)]:pl-5"
+                    >
+                      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--accent)]">{n}</p>
+                      <p className="mt-2 text-[15px] tracking-tight text-zinc-100">{h}</p>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-500">{b}</p>
+                    </li>
+                  ))}
+                </ol>
+
+                <div className="relative mt-10 border border-white/12 p-5" data-card>
+                  <span aria-hidden="true" className="absolute -left-px -top-px h-3 w-3 border-l border-t border-[var(--accent)]" />
+                  <span aria-hidden="true" className="absolute -right-px -top-px h-3 w-3 border-r border-t border-[var(--accent)]" />
+                  <span aria-hidden="true" className="absolute -bottom-px -left-px h-3 w-3 border-b border-l border-[var(--accent)]" />
+                  <span aria-hidden="true" className="absolute -bottom-px -right-px h-3 w-3 border-b border-r border-[var(--accent)]" />
+                  <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+                    Status <span className="text-zinc-700">·</span> <span className="text-zinc-200">Planned</span>
+                  </p>
+                  <p className="mt-3 text-[14px] leading-relaxed text-zinc-400">
+                    No token exists today. The share of the fee, the venue and the schedule are published before the first
+                    purchase, not after. A buyback is a use of revenue, not a promise about price.
+                  </p>
+                  <Link
+                    href="/blog/the-mark-only-moves-up"
+                    className="mt-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline"
+                  >
+                    How the fee works <span aria-hidden="true">&rarr;</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </section>
 

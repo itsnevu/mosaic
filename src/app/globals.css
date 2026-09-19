@@ -468,6 +468,15 @@ input[type="range"].slider::-moz-range-thumb {
 }
 
 /* ---------- fx: three.js hero field, split words, scroll progress ---------- */
+/* [03] $MOSAIC ticker: its own scene class so the hero's .fx-scene tweens and mask never touch it. */
+.fx-ticker { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #0a0a0a; touch-action: pan-y; }
+.fx-ticker-scene { position: absolute; inset: 0; cursor: crosshair; }
+.fx-ticker-scene canvas { width: 100% !important; height: 100% !important; display: block; }
+.fx-ticker-fallback { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: #f4f4f5; font-weight: 700; font-size: clamp(44px, 9vw, 128px); letter-spacing: -0.045em; line-height: 1; }
+.fx-ticker-fallback span::first-letter { color: var(--accent); }
+.fx-ticker[data-fallback="1"] .fx-ticker-scene { display: none; }
+.fx-ticker[data-fallback="1"] .fx-ticker-fallback { display: flex; }
+@media (prefers-reduced-motion: reduce) { .fx-ticker-scene { cursor: default; } }
 .fx-scene { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .fx-scene canvas { width: 100% !important; height: 100% !important; display: block; }
 .fx-scene { -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 38%, #000 70%); mask-image: linear-gradient(90deg, transparent 0%, transparent 38%, #000 70%); }
