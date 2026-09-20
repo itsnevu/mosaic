@@ -48,3 +48,7 @@ next-env.d.ts
 
 # internal content brief, never published
 design/PROJECT-BRIEF.md
+design/DESIGN.md
+
+# key visuals and their sources stay local, like the brief
+design/key-visuals/
