@@ -38,6 +38,14 @@
 - **Pass UI sebelumnya** (diukur lewat CDP, bukan ditebak dari screenshot): overflow horizontal di mobile pada `/whitepaper` dan post blog diperbaiki — `mx-auto` pada grid item mematikan stretch sehingga lebarnya jatuh ke min-content (714px di viewport 390px). Header mobile pindah ke pola dua baris seperti landing page. Daftar isi punya penanda posisi baca. Sel abu-abu menggantung di indeks docs hilang. Empty state dashboard tidak lagi menampilkan `$—` / `— of $—` / `PERFORMANCE FEE — OF YIELD`.
 - `npm run build` ✓ · `tsc` ✓ · `lint` ✓ · scrollWidth = viewport di 390/768/1440px
 
+**Upgrade 20 Sep 2026 — tiga fitur dashboard, semua dibaca dari chain**
+- **Earned di Your position**: nilai hari ini + yang ditarik − yang disetor, dari event `Deposit`/`Withdraw` milik wallet itu sendiri (`useUserLedger`). Ditahan (tampil "—" plus alasannya) kalau ada share yang masuk/keluar lewat transfer atau fee mint, atau riwayat tak terjangkau.
+- **Share price since launch** (`SharePriceChart.tsx`, `useSharePriceHistory`): satu garis dari titik yang memang ada di chain — blok launch tepat 1.0000, tiap `FeeAccrued` (harga pasca-fee), tiap deposit/redeem (assets ÷ shares). Tanpa sampling, tanpa proyeksi; caption menyebut jumlah event.
+- **Exit route** di form withdraw (`useExitRoute`): buffer dulu, lalu venue per registry order sesuai yang dilaporkan bebas, plus kekurangan kalau tidak lolos. Tombol tidak mengirim kalau rutenya tidak clear. Diuji di fork Robinhood Chain: rute yang ditampilkan cocok dengan `AdapterWithdraw` yang benar-benar terjadi.
+- **Pemindai log adaptif** (`src/lib/logs.ts`): minta seluruh rentang dulu, menyusut hanya kalau provider menolak, span yang berhasil diingat, hasil di-cache per query di browser, refetch cuma membaca ekor. Dipakai History (dulu cuma ~1 jam terakhir di chain sub-detik), Depositors, chart, earned. 15 tes unit (tanpa cap, cap 10k, budget habis, inkremental, prior tidak lengkap).
+- **Relay**: jawaban riwayat tertutup (log/blok ≥128 blok di belakang head) disimpan 1 jam di memori; jawaban `null` tidak pernah disimpan — dulu receipt `null` di-cache 2 detik dan bikin viem menganggap tx diganti ("Failed" padahal sukses).
+- **`/changelog`** (`content/changelog.md`), tautan di nav konten dan footer landing. Koreksi copy landing: "cheapest exit first" → registry order, "Anyone can trigger it" → keeper yang diizinkan. Diverifikasi di headless Chrome terhadap fork mainnet (state produksi asli): nol console error, `npm run build` ✓, `tsc` ✓, `lint` ✓.
+
 **Konfigurasi produksi**
 - `src/lib/chain.ts` tidak lagi placeholder: chain id, RPC, explorer, dan alamat kontrak dibaca dari `NEXT_PUBLIC_*` saat build (`.env.example`). Tanpa env, app jalan di Anvil seperti biasa.
 - `contracts/script/DeployProduction.s.sol`: deploy vault ke USDG asli + daftar adapter yang alamatnya disuplai lewat env, set keeper/cap/buffer/fee, `pokeRates()`, lalu serahkan ownership ke multisig dan tulis `deployments/production.json`.

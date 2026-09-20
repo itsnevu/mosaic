@@ -165,3 +165,7 @@ export function formatDate(iso?: string): string {
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
 }
+
+export function getChangelog(): Doc {
+  return readDoc(path.join(ROOT, "content/changelog.md"), "changelog");
+}

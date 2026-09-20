@@ -7,9 +7,11 @@ import { useConnection, usePublicClient, useWriteContract } from "wagmi";
 import ConnectButton, { truncateAddress } from "@/components/ConnectButton";
 import { ActivityFeed, OpsPanel } from "@/components/Operations";
 import { WrongChainBanner, chainName } from "@/components/NetworkGuard";
-import { useAllocations, useUserPosition, useVaultOps, useVaultStats } from "@/lib/hooks";
+import { SharePriceChart } from "@/components/SharePriceChart";
+import { useSharePriceHistory, useUserLedger } from "@/lib/events";
+import { useAllocations, useExitRoute, useUserPosition, useVaultOps, useVaultStats, type Allocation } from "@/lib/hooks";
 import { BPS, SHARE_DECIMALS, USDG_DECIMALS, mosaicVaultAbi, usdgAbi } from "@/lib/contracts";
-import { fmtBps, fmtPps, fmtShares, fmtUsdg, usd } from "@/lib/format";
+import { fmtBps, fmtPps, fmtShares, fmtSignedUsdg, fmtUsdg, usd } from "@/lib/format";
 
 /* ---------- small pieces (mirrors landing page style) ---------- */
 
@@ -73,8 +75,10 @@ export default function Dashboard() {
   const { address, isConnected, chainId: walletChainId } = useConnection();
   const stats = useVaultStats();
   const pos = useUserPosition(address);
+  const ledger = useUserLedger(address);
   const { allocations } = useAllocations(stats.poolCount);
   const ops = useVaultOps();
+  const history = useSharePriceHistory();
   const d = stats.deployment;
 
   const wrongChain = isConnected && walletChainId !== undefined && walletChainId !== stats.chainId;
@@ -98,6 +102,33 @@ export default function Dashboard() {
     stats.depositCap && stats.depositCap > 0n && stats.totalAssets !== undefined
       ? Number((stats.totalAssets * BigInt(BPS)) / stats.depositCap)
       : undefined;
+
+  // What the position earned: today's value plus everything withdrawn, minus everything
+  // deposited, all from this address's own events. Shown only when that arithmetic is the
+  // whole story — a transfer in or out, or a fee mint, and it is not.
+  const earnedFrom: { deposited?: bigint; withdrawn?: bigint } = ledger.unreliable ? {} : ledger;
+  const earned =
+    pos.assetValue !== undefined && earnedFrom.deposited !== undefined && earnedFrom.withdrawn !== undefined
+      ? pos.assetValue + earnedFrom.withdrawn - earnedFrom.deposited
+      : undefined;
+  const earnedNote =
+    !stats.hasDeployment || d?.block === undefined
+      ? "Earnings need the launch block to scan from; this deployment does not record one."
+      : ledger.unreliable === "transfers"
+        ? "Shares reached or left this wallet by transfer or fee mint, so earnings cannot be read from deposits alone."
+        : ledger.unreliable === "incomplete"
+          ? "The chain would not serve this wallet's full history, so no figure is shown."
+          : !ledger.isLoaded
+            ? "Reading this wallet's deposits and redemptions…"
+            : ledger.deposits === 0
+              ? "No deposits from this wallet yet."
+              : `Value today, plus what was withdrawn, minus what was deposited: ${ledger.deposits} deposit${
+                  ledger.deposits === 1 ? "" : "s"
+                } since ${
+                  ledger.since === undefined
+                    ? "launch"
+                    : new Date(ledger.since * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+                }. Nothing was claimed; it arrived in the share price.`;
 
   return (
     <>
@@ -176,6 +207,23 @@ export default function Dashboard() {
             · Vault{" "}
             <span className="normal-case font-mono">{d ? d.vault : "—"}</span>
           </p>
+
+          {stats.hasDeployment && (
+            <SharePriceChart
+              points={history.points}
+              livePps={unreachable ? undefined : stats.pricePerShare}
+              now={history.fetchedAt}
+              eventCount={history.eventCount}
+              complete={history.complete}
+              isLoaded={history.isLoaded}
+              isError={history.isError || unreachable}
+              unavailable={
+                d?.block === undefined
+                  ? "This deployment does not record its launch block, so its history cannot be scanned."
+                  : undefined
+              }
+            />
+          )}
         </section>
 
         {/* allocation */}
@@ -276,20 +324,31 @@ export default function Dashboard() {
                 </div>
               </>
             ) : (
-              <dl className="mt-2 divide-y divide-[color:var(--line)]">
-                {[
-                  ["Wallet", address ? truncateAddress(address, 8, 6) : "—"],
-                  ["USDG balance", usd(pos.usdgBalance)],
-                  ["mUSDG shares", fmtShares(pos.shares)],
-                  ["Value in USDG", usd(pos.assetValue)],
-                  ["Allowance to vault", usd(pos.allowance)],
-                ].map(([k, v]) => (
-                  <div key={k} className="py-3 flex items-baseline justify-between gap-4">
-                    <dt className="label">{k}</dt>
-                    <dd className="font-mono tracking-tight">{v}</dd>
+              <>
+                <dl className="mt-2 divide-y divide-[color:var(--line)]">
+                  {[
+                    ["Wallet", address ? truncateAddress(address, 8, 6) : "—"],
+                    ["USDG balance", usd(pos.usdgBalance)],
+                    ["mUSDG shares", fmtShares(pos.shares)],
+                    ["Value in USDG", usd(pos.assetValue)],
+                    ["Deposited", usd(earnedFrom.deposited)],
+                    ...(earnedFrom.withdrawn ? [["Withdrawn", usd(earnedFrom.withdrawn)]] : []),
+                    ["Allowance to vault", usd(pos.allowance)],
+                  ].map(([k, v]) => (
+                    <div key={k} className="py-3 flex items-baseline justify-between gap-4">
+                      <dt className="label">{k}</dt>
+                      <dd className="font-mono tracking-tight">{v}</dd>
+                    </div>
+                  ))}
+                  <div className="py-3 flex items-baseline justify-between gap-4">
+                    <dt className="label !text-ink">Earned</dt>
+                    <dd className={`font-mono tracking-tight text-xl ${earned === undefined ? "" : "text-money"}`}>
+                      {earned === undefined ? "—" : fmtSignedUsdg(earned)}
+                    </dd>
                   </div>
-                ))}
-              </dl>
+                </dl>
+                <p className="label mt-3 !normal-case !tracking-normal">{earnedNote}</p>
+              </>
             )}
           </div>
 
@@ -303,6 +362,7 @@ export default function Dashboard() {
             onDone={() => {
               stats.refetch();
               pos.refetch();
+              ledger.refetch();
             }}
           />
           <WithdrawForm
@@ -311,10 +371,12 @@ export default function Dashboard() {
             shares={pos.shares}
             pricePerShare={stats.pricePerShare}
             capacity={ops.withdrawalCapacity}
+            allocations={allocations}
             blockedBecause={blockedBecause("withdraw")}
             onDone={() => {
               stats.refetch();
               pos.refetch();
+              ledger.refetch();
             }}
           />
         </section>
@@ -432,6 +494,7 @@ function WithdrawForm({
   shares,
   pricePerShare,
   capacity,
+  allocations,
   blockedBecause,
   onDone,
 }: {
@@ -441,6 +504,8 @@ function WithdrawForm({
   pricePerShare?: bigint;
   /** What the vault could pay out right now, across idle and liquid pool balances. */
   capacity?: bigint;
+  /** Registry-ordered adapters, for naming the venues a redemption would unwind. */
+  allocations: Allocation[];
   /** Set when redeeming is unavailable; the reason is shown on the button. */
   blockedBecause?: string;
   onDone: () => void;
@@ -461,8 +526,17 @@ function WithdrawForm({
   // estimate: shares (12 dec) * pps (1e18) / 1e18 / 1e6 -> USDG (6 dec)
   const est = parsed !== undefined && pricePerShare !== undefined ? (parsed * pricePerShare) / 10n ** 24n : undefined;
   const overCapacity = est !== undefined && capacity !== undefined && est > capacity;
+  const route = useExitRoute(disabled || tooMany ? undefined : parsed, allocations);
   const canSubmit =
-    !disabled && !!vault && !!address && parsed !== undefined && parsed > 0n && !tooMany && !overCapacity && tx.kind !== "pending";
+    !disabled &&
+    !!vault &&
+    !!address &&
+    parsed !== undefined &&
+    parsed > 0n &&
+    !tooMany &&
+    !overCapacity &&
+    route.clears !== false &&
+    tx.kind !== "pending";
 
   async function submit() {
     if (!canSubmit || !vault || !address || parsed === undefined || !client) return;
@@ -485,8 +559,8 @@ function WithdrawForm({
       <p className="tag mb-4">[06] Withdraw</p>
       <h2 className="text-[28px] leading-[1] tracking-[-0.03em] font-medium">Redeem shares.</h2>
       <p className="mt-3 text-[14.5px] leading-relaxed text-muted">
-        Burn mUSDG, receive USDG at the current price. Served from the buffer; larger amounts unwind pools. Full fill
-        or revert.
+        Burn mUSDG, receive USDG at the current price. Served from the buffer; larger amounts unwind pools in
+        registry order. Full fill or revert.
       </p>
       <label className="label block mt-8">Shares (mUSDG)</label>
       <div className="field mt-2 flex items-stretch">
@@ -517,6 +591,51 @@ function WithdrawForm({
             ? "Available liquidity unknown."
             : `Vault can serve ${usd(capacity, 0)} right now.`}
       </p>
+
+      {/* The route this redemption takes, before the wallet asks for a signature. */}
+      {parsed !== undefined && parsed > 0n && !disabled && !tooMany && (
+        <div className="mt-6 border-y hairline">
+          <p className="label py-2 border-b hairline">
+            Route{route.assets !== undefined ? ` · ${usd(route.assets)} out` : ""}
+          </p>
+          {route.steps.length === 0 ? (
+            <p className="label py-3 !normal-case !tracking-normal">
+              {route.isLoaded ? "The vault did not answer." : "Asking the vault…"}
+            </p>
+          ) : (
+            <ol className="divide-y divide-[color:var(--line)]">
+              {route.steps.map((s, i) => (
+                <li key={s.name} className="py-2.5 flex items-baseline justify-between gap-4">
+                  <span className="label !text-ink">
+                    <span className="text-faint mr-2">{String(i + 1).padStart(2, "0")}</span>
+                    {s.name}
+                  </span>
+                  <span className="font-mono text-[13px] tracking-tight whitespace-nowrap">
+                    {usd(s.take)}
+                    <span className="text-faint"> of {usd(s.available)} free</span>
+                  </span>
+                </li>
+              ))}
+              {route.short > 0n && (
+                <li className="py-2.5 flex items-baseline justify-between gap-4">
+                  <span className="label !text-ink">Short by</span>
+                  <span className="font-mono text-[13px] tracking-tight whitespace-nowrap">{usd(route.short)} · would revert</span>
+                </li>
+              )}
+            </ol>
+          )}
+          {route.clears !== undefined && (
+            <p className="label py-2 border-t hairline !normal-case !tracking-normal">
+              {route.clears
+                ? route.steps.length === 1
+                  ? "Clears from the buffer. No pool is touched."
+                  : `Clears. Buffer first, then ${route.steps.length - 1} venue${route.steps.length === 2 ? "" : "s"} in registry order, each for what it reports free.`
+                : "Would not clear: you would keep your shares and pay only gas."}
+            </p>
+          )}
+        </div>
+      )}
+
       <button type="button" className="btn mt-6 w-full" disabled={!canSubmit} onClick={submit}>
         {blockedBecause ?? (overCapacity ? "Above available liquidity" : "Redeem")}
       </button>

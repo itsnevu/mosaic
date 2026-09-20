@@ -6,6 +6,7 @@ const NAV = [
   { href: "/docs", label: "Docs" },
   { href: "/whitepaper", label: "Whitepaper" },
   { href: "/blog", label: "Blog" },
+  { href: "/changelog", label: "Changelog" },
 ] as const;
 
 /** Header shared by every long-form page, deliberately quieter than the landing header. */

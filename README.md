@@ -30,18 +30,24 @@ scripts/keeper.mjs      polls, prices gas into USDG, deploys and rebalances when
 src/lib/chain.ts        Anvil chain + production chain read from NEXT_PUBLIC_* (see .env.example)
 src/lib/contracts.ts    DEPLOYMENTS by chain id, ABIs, decimals constants
 src/lib/hooks.ts        useVaultStats, useUserPosition, useAllocations, useVaultOps
-src/lib/events.ts       useVaultActivity — vault history straight from chain logs
+src/lib/events.ts       useVaultActivity, useDepositorCount, useUserLedger (what a position earned),
+                        useSharePriceHistory — all straight from chain logs
+src/lib/logs.ts         adaptive log scanner: whole range first, narrower only if the provider refuses,
+                        cached per query in the browser, reports whether it reached the launch block
 src/lib/wagmi.ts        wagmi config (injected connector)
 src/components/Providers.tsx, ConnectButton.tsx, Dashboard.tsx
+src/components/SharePriceChart.tsx  share price since launch, drawn only from on-chain events
 src/components/NetworkGuard.tsx  wrong-network banner + switch-chain button
 src/components/Operations.tsx    liquidity/rebalance panel + activity feed
 src/app/app/page.tsx    vault dashboard (/app)
 src/lib/content.ts      markdown pages: frontmatter, rendering, table of contents
 src/components/ContentShell.tsx  header/footer/TOC shared by docs, blog and whitepaper
-src/app/docs, /blog, /whitepaper  statically generated from content/*.md
+src/app/docs, /blog, /whitepaper, /changelog  statically generated from content/*.md
+src/app/api/rpc/route.ts  same-origin read relay: allowlisted methods, shared answers, closed history kept an hour
 content/whitepaper.md   the protocol whitepaper (served at /whitepaper)
 content/docs/*.md       documentation pages (served at /docs/<slug>)
 content/blog/*.md       blog posts (served at /blog/<slug>)
+content/changelog.md    what changed, when, and where to check it (served at /changelog)
 docs/SECURITY.md        trust model, invariants, known gaps, deployment checklist
                         — also rendered as /docs/security, so the two never drift
 ```

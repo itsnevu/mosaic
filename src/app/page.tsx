@@ -130,7 +130,7 @@ const FAQ: QA[] = [
   },
   {
     q: "How do withdrawals work?",
-    a: "You redeem shares; the vault burns them and returns USDG at the current price per share. Ordinary withdrawals are served instantly from the idle buffer. Larger ones unwind positions from the cheapest exit first and never partially fill: you receive the full amount or the transaction reverts and you keep your shares.",
+    a: "You redeem shares; the vault burns them and returns USDG at the current price per share. Ordinary withdrawals are served instantly from the idle buffer. Larger ones unwind pools in registry order, each for what it has free, and never partially fill: you receive the full amount or the transaction reverts and you keep your shares. The app shows the route before you sign.",
   },
   {
     q: "What are the fees?",
@@ -378,7 +378,7 @@ export default function Home() {
                 </div>
                 <div className="grid grid-rows-2">
                   <RailCell tag="Share rail" title="No claim button." body="Yield is the price per share rising. Same shares, worth more USDG. Nothing to harvest, nothing to remember." />
-                  <RailCell tag="Exit rail" title="Buffer first, then unwind." body="Ordinary redemptions clear from the idle buffer instantly. Larger ones unwind pools cheapest-exit first, filled in full or reverted." last />
+                  <RailCell tag="Exit rail" title="Buffer first, then unwind." body="Ordinary redemptions clear from the idle buffer instantly. Larger ones unwind pools in registry order, filled in full or reverted. The route is shown before you sign." last />
                 </div>
               </div>
             </div>
@@ -428,7 +428,7 @@ export default function Home() {
                   </Link>
                 </div>
                 <div className="grid grid-rows-2">
-                  <RailCell tag="Who moves it" title="A keeper, bounded." body="Anyone can trigger it. It cannot send funds outside registered adapters, exceed a ceiling, or skip the cooldown. Its freedom is when, never where." />
+                  <RailCell tag="Who moves it" title="A keeper, bounded." body="Only an allowed keeper can trigger it, and it cannot send funds outside registered adapters, exceed a ceiling, or skip the cooldown. Its freedom is when, never where." />
                   <RailCell tag="Why it holds" title="Min-output or revert." body="Every rebalance carries an on-chain minimum-output check. A move that would execute worse than expected reverts instead of completing at a bad price." last />
                 </div>
               </div>
@@ -678,6 +678,7 @@ export default function Home() {
                 <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/docs">Docs</Link>
                 <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/whitepaper">Whitepaper</Link>
                 <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/blog">Blog</Link>
+                <Link className="-my-2 py-2 text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline" href="/changelog">Changelog</Link>
               </div>
             </div>
           </div>

@@ -251,6 +251,76 @@ export function useVaultOps(): VaultOps {
   };
 }
 
+export type ExitStep = {
+  name: string;
+  /** Undefined for the idle buffer. */
+  adapter?: Address;
+  /** USDG this step supplies. */
+  take: bigint;
+  /** USDG this step could supply right now. */
+  available: bigint;
+};
+
+export type ExitRoute = {
+  /** USDG the redemption returns, from `previewRedeem`. */
+  assets?: bigint;
+  /** Buffer first, then venues in registry order, only those the redemption touches. */
+  steps: ExitStep[];
+  /** USDG the route falls short by; zero when the redemption clears. */
+  short: bigint;
+  /** Undefined until the vault has answered. */
+  clears?: boolean;
+  isLoaded: boolean;
+};
+
+/**
+ * The path a redemption would take, computed the way `_withdraw` walks it: the idle buffer
+ * first, then each adapter in registry order for what it has free, and a revert if anything
+ * is still owed at the end. Read from the vault's own views, so the page shows the route
+ * before the wallet asks for a signature.
+ */
+export function useExitRoute(shares: bigint | undefined, allocations: Allocation[]): ExitRoute {
+  const chainId = useChainId();
+  const d = getDeployment(chainId);
+  const base = { address: d?.vault as Address, abi: mosaicVaultAbi } as const;
+  const want = shares !== undefined && shares > 0n;
+
+  const q = useReadContracts({
+    contracts: [
+      { ...base, functionName: "previewRedeem", args: [shares ?? 0n] },
+      { ...base, functionName: "idleAssets" },
+      { ...base, functionName: "liquidityByAdapter" },
+    ],
+    query: { enabled: !!d?.vault && want, refetchInterval: REFETCH },
+  });
+
+  const r = q.data;
+  const ok = (i: number) => r?.[i]?.status === "success";
+  const assets = ok(0) ? (r![0].result as bigint) : undefined;
+  const idle = ok(1) ? (r![1].result as bigint) : undefined;
+  const liq = ok(2) ? (r![2].result as readonly [readonly bigint[], readonly bigint[]]) : undefined;
+
+  if (!want || assets === undefined || idle === undefined || liq === undefined) {
+    return { assets, steps: [], short: 0n, isLoaded: !want || q.isFetched };
+  }
+
+  const steps: ExitStep[] = [];
+  let need = assets;
+  const fromBuffer = need < idle ? need : idle;
+  steps.push({ name: "Idle buffer", take: fromBuffer, available: idle });
+  need -= fromBuffer;
+  const [, available] = liq;
+  for (let i = 0; i < available.length && need > 0n; i++) {
+    const take = need < available[i] ? need : available[i];
+    if (take === 0n) continue;
+    const a = allocations.find((x) => x.index === i);
+    steps.push({ name: a?.name ?? `Adapter ${i + 1}`, adapter: a?.adapter, take, available: available[i] });
+    need -= take;
+  }
+
+  return { assets, steps, short: need, clears: need === 0n, isLoaded: true };
+}
+
 /**
  * The vault's blended rate: each venue's rate weighted by what it actually holds.
  * Returns undefined until a chain answers, so callers can show a dash rather than a stand-in.

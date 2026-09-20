@@ -108,8 +108,8 @@ export function ActivityFeed() {
           </h2>
         </div>
         <p className="label max-w-sm">
-          Deployments, rebalances, fee accruals and target changes, in reverse order. Straight from chain logs —
-          there is no server in between.
+          Deployments, rebalances, fee accruals and target changes, in reverse order. Straight from chain logs,
+          through a relay that stores nothing.
         </p>
       </div>
 

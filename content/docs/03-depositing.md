@@ -44,6 +44,11 @@ until a borrower repays.
 If your amount exceeds that figure, the button tells you so instead of letting you send a
 transaction that will fail.
 
+Type an amount and the panel also shows the route the redemption would take, computed the way
+the contract walks it: how much comes from the buffer, how much unwinds from which venue, in
+registry order, and whether the whole amount clears. You see the path before the wallet asks for a
+signature.
+
 ### When capacity is tight
 
 Lending venues can be temporarily illiquid — that is a normal state for a lending market, not a
@@ -60,13 +65,14 @@ claiming otherwise while supplying to lending markets is describing something it
 | Panel | What it tells you |
 | --- | --- |
 | **TVL, share price, pools** | the vault's size and the price your shares are worth |
+| **Share price since launch** | one line drawn from every fee accrual, deposit and redemption on-chain, starting at exactly 1.0000; no sampling and no projection |
 | **Allocation** | which venue holds which portion, current weight against target, and the rate each pays |
 | **Operations** | what could be withdrawn right now, the share of TVL that is liquid, current drift, and whether a rebalance is worth doing |
-| **Your position** | your USDG, your shares, what they are worth, and your allowance |
+| **Your position** | your USDG, your shares, what they are worth, what you deposited and withdrew, and what the position has earned — read from your own `Deposit` and `Withdraw` events |
 | **History** | every deployment, rebalance, fee accrual and target change, read straight from chain logs |
 
-Everything on that page is read from the chain in the browser. There is no server in between, and
-nothing shown is a stand-in — when a number cannot be read, it shows a dash rather than a plausible
+Everything on that page is read from the chain in the browser, through a same-origin relay that
+forwards read calls and stores nothing. Nothing shown is a stand-in — when a number cannot be read, it shows a dash rather than a plausible
 substitute.
 
 ## Fees, in practice
